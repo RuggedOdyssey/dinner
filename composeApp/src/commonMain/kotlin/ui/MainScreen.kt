@@ -1,3 +1,5 @@
+package ui
+
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Box
@@ -23,7 +25,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 @Preview
-fun App() {
+fun MainScreen() {
 
     val viewModel = remember { MainViewModel() }
 

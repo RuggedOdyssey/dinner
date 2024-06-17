@@ -1,10 +1,12 @@
-import io.ktor.client.*
-import io.ktor.client.engine.okhttp.*
+package data
+
+import io.ktor.client.HttpClient
+import io.ktor.client.HttpClientConfig
+import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.logging.Logging
-import io.ktor.util.logging.KtorSimpleLogger
 import java.util.concurrent.TimeUnit
 
-actual fun httpClient(config: HttpClientConfig<*>.() -> Unit) = HttpClient(OkHttp) {
+actual fun createHttpClient(config: HttpClientConfig<*>.() -> Unit) = HttpClient(OkHttp) {
     config(this)
     install(Logging)
     engine {
