@@ -12,3 +12,14 @@ This is a Kotlin Multiplatform project targeting Android, iOS.
 
 
 Learn more about [Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html)…
+
+# How to setup the token for this app to work
+
+You need a token to access the api
+
+Prerequisites to run:
+1. Download gcloud CLI (using brew gcloud command)
+2. Run gcloud auth print-access-token
+3. Copy the token into local.properties in the format below  
+   `VERTEX_TOKEN=<insert your token here>`
+4. Run the command `./gradlew generateBuildKonfig` to read the token from your local.properties an include it in the code
