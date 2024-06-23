@@ -18,7 +18,7 @@ class GetGeminiRecipeUseCase(private val service: VertexService = VertexService(
 
     private companion object {
         const val PROMPT_WRAPPER_PREFIX =
-            "Given the image of an italian takeaway dish, write a recipe and include the following ingredients:\n"
+            "Given the image of a takeaway dish, write a recipe that can easily be made at home and include the following ingredients:\n"
         const val PROMPT_WRAPPER_SUFFIX =
             "\nThen provide grocery list of the additional ingredients with there quantities in metric, which is needed for the recipe. exclude the ingredients I listed already."
     }
