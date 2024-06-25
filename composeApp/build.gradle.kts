@@ -1,6 +1,7 @@
-import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING
 
 val ktorVersion = "2.3.5"
 
@@ -10,6 +11,7 @@ plugins {
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.compose.compiler)
     kotlin("plugin.serialization") version "2.0.0"
+    id("com.codingfeline.buildkonfig")
 }
 
 kotlin {
@@ -54,10 +56,10 @@ kotlin {
             implementation(libs.peekaboo.image.picker)
 
             implementation(libs.kotlinx.coroutines.core)
-            implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2")
-            implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
-            implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
-            implementation("io.ktor:ktor-client-logging:$ktorVersion")
+            implementation(libs.kotlinx.serialization.json)
+            implementation(libs.ktor.client.content.negotiation)
+            implementation(libs.ktor.serialization.kotlinx.json)
+            implementation(libs.ktor.client.logging)
 //            implementation ("com.google.cloud:google-cloud-vertexai:0.4.0")
         }
         iosMain.dependencies {
@@ -100,6 +102,19 @@ android {
     }
     dependencies {
         debugImplementation(compose.uiTooling)
+    }
+}
+buildkonfig {
+    packageName = "com.handen.whatsfordinner"
+
+    defaultConfigs {
+        val TOKEN: String = gradleLocalProperties(rootDir).getProperty("VERTEX_TOKEN")
+
+        require(TOKEN.isNotEmpty()) {
+            "Register your api key from developer and place it in local.properties as `VERTEX_TOKEN`"
+        }
+
+        buildConfigField(STRING, "TOKEN", TOKEN)
     }
 }
 

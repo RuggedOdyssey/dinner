@@ -1,5 +1,6 @@
 package data
 
+import com.handen.whatsfordinner.BuildKonfig
 import data.dto.CandidatesResponse
 import data.dto.Content
 import data.dto.GeminiPromptRequest
@@ -39,6 +40,7 @@ class VertexService {
     private val json = Json {
         encodeDefaults = true
         explicitNulls = false
+        ignoreUnknownKeys = true
     }
 
     suspend fun getGeminiResponse(encodedImage: String, prompt: String): Result<String> {
@@ -48,7 +50,7 @@ class VertexService {
         builder.method = HttpMethod.Post
         builder.headers {
             append("Content-Type", "application/json")
-            append("Authorization", "Bearer $TOKEN")
+            append("Authorization", "Bearer ${BuildKonfig.TOKEN}")
         }
         val body = makeBody(prompt, encodedImage)
         builder.setBody(body)
@@ -93,7 +95,5 @@ class VertexService {
         const val PROJECT_ID = "whats-for-dinner-416112"
         const val LOCATION_ID = "us-central1"
         const val MODEL_ID = "gemini-1.5-flash-001"
-        const val TOKEN =
-            "ya29.a0AXooCguZ3Fw4JCQQ4b58sDEnE4FWsp4GWNcFUEb7kHu2dXdpS3bA9LN7JTzlsLNsf9mmoASePJr01BTl28akaKGxeioqb5tBL6Hk5G6QtpjwJ9oX0Xh1PmGprTvKWiEJ-JeAuUNjAOG7tyEjraYmTSvXUt1GD-T5JXHZFjn2NtEaCgYKAYISARMSFQHGX2MiDyDJeLk0paaR1ufnbsvdQA0178"
     }
 }

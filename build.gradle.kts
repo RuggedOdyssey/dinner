@@ -1,3 +1,8 @@
+buildscript {
+    dependencies {
+        classpath(libs.buildkonfig.gradle.plugin)
+    }
+}
 plugins {
     // this is necessary to avoid the plugins to be loaded multiple times
     // in each subproject's classloader
