@@ -1,15 +1,14 @@
 package ui
 
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.Button
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Tab
+import androidx.compose.material.TabRow
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
@@ -17,6 +16,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.preat.peekaboo.ui.camera.PeekabooCamera
@@ -54,7 +54,7 @@ fun MainScreen() {
                         state = state,
                         modifier = Modifier.fillMaxSize(),
                         permissionDeniedContent = {
-                            // Custom UI content for permission denied scenario
+                            Text("Please grant camera permission")
                         },
                     )
                 }
@@ -69,15 +69,30 @@ fun MainScreen() {
             }
 
             is MainViewModel.MainViewState.Success -> {
-                // TODO fix scroll
-                Box(Modifier.fillMaxSize().scrollable(rememberScrollState(), orientation = Orientation.Vertical)) {
-                    Text((viewState as MainViewModel.MainViewState.Success).result)
+                val output = (viewState as MainViewModel.MainViewState.Success).result
+                var selectedTabIndex by remember { mutableStateOf(0) }
+                val tabs = listOf("Groceries", "Recipe")
+                Column {
+                    TabRow(selectedTabIndex = selectedTabIndex) {
+                        tabs.forEachIndexed { index, title ->
+                            Tab(
+                                selected = selectedTabIndex == index,
+                                onClick = { selectedTabIndex = index },
+                                text = { Text(text = title) }
+                            )
+                        }
+                    }
+                    when (selectedTabIndex) {
+                        0 -> GroceriesCard(groceries = output.groceries)
+                        1 -> RecipeCard(recipe = output.recipe)
+                    }
                 }
             }
 
             is MainViewModel.MainViewState.Error -> {
                 Text((viewState as MainViewModel.MainViewState.Error).text)
             }
+
         }
     }
 }
