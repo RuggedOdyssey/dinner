@@ -54,7 +54,7 @@ fun MainScreen() {
                         state = state,
                         modifier = Modifier.fillMaxSize(),
                         permissionDeniedContent = {
-                            Text("Please grant camera permission")
+                            Text("Permission denied")
                         },
                     )
                 }
@@ -92,7 +92,10 @@ fun MainScreen() {
             is MainViewModel.MainViewState.Error -> {
                 Text((viewState as MainViewModel.MainViewState.Error).text)
             }
-
+//            BackHandler(enabled = true, onBack = {
+//                viewModel.back()
+//            }
+//            )
         }
     }
 }

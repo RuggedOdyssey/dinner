@@ -27,6 +27,10 @@ class MainViewModel : ViewModel() {
         }
     }
 
+    fun back() {
+        state.value = MainViewState.Input
+    }
+
     sealed interface MainViewState {
         data object Input : MainViewState
         data object Loading : MainViewState
