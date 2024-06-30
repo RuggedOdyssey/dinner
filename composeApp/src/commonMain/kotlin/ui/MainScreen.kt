@@ -1,26 +1,36 @@
 package ui
 
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Button
 import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Tab
+import androidx.compose.material.TabRow
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
+import androidx.compose.material.TopAppBar
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.preat.peekaboo.ui.camera.PeekabooCamera
 import com.preat.peekaboo.ui.camera.rememberPeekabooCameraState
+import data.dto.Output
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
@@ -31,53 +41,122 @@ fun MainScreen() {
 
     MaterialTheme {
         val viewState by viewModel.state.collectAsState()
-        when (viewState) {
-            is MainViewModel.MainViewState.Input -> {
-                val input = remember { mutableStateOf("") }
-                val state = rememberPeekabooCameraState(onCapture = {
-                    it?.let { image ->
-                        viewModel.getRecipe(image, input)
+        val showBack by remember { derivedStateOf { viewState !is MainViewModel.MainViewState.Input } }
+        val screenTitle by remember { derivedStateOf { if (!showBack) "What's for dinner?" else "" } }
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = { Text(screenTitle) },
+                    navigationIcon = {
+                        if (showBack) {
+                            IconButton(onClick = viewModel::back) {
+                                Icon(
+                                    Icons.AutoMirrored.Filled.ArrowBack,
+                                    contentDescription = "Back"
+                                )
+                            }
+                        }
                     }
-                })
-                Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-                    TextField(
-                        value = input.value,
-                        onValueChange = { input.value = it },
-                        label = { Text("Enter available products") }
-                    )
-                    Button(onClick = {
-                        state.capture()
-                    }) {
-                        Text("Take photo")
-                    }
-                    PeekabooCamera(
-                        state = state,
-                        modifier = Modifier.fillMaxSize(),
-                        permissionDeniedContent = {
-                            // Custom UI content for permission denied scenario
-                        },
+                )
+            }
+
+        ) { innerPadding ->
+            when (viewState) {
+                is MainViewModel.MainViewState.Input -> {
+                    InputScreen(
+                        modifier = Modifier.padding(innerPadding),
+                        getRecipe = viewModel::getRecipe
                     )
                 }
-            }
 
-
-            is MainViewModel.MainViewState.Loading -> {
-                Box(Modifier.fillMaxSize()) {
-                    CircularProgressIndicator(Modifier.align(Alignment.Center))
+                is MainViewModel.MainViewState.Loading -> {
+                    ProgressScreen(
+                        modifier = Modifier.padding(innerPadding),
+                    )
                 }
 
-            }
-
-            is MainViewModel.MainViewState.Success -> {
-                // TODO fix scroll
-                Box(Modifier.fillMaxSize().scrollable(rememberScrollState(), orientation = Orientation.Vertical)) {
-                    Text((viewState as MainViewModel.MainViewState.Success).result)
+                is MainViewModel.MainViewState.Success -> {
+                    val output = (viewState as MainViewModel.MainViewState.Success).result
+                    RecipeScreen(
+                        modifier = Modifier.padding(innerPadding), output = output
+                    )
                 }
-            }
 
-            is MainViewModel.MainViewState.Error -> {
-                Text((viewState as MainViewModel.MainViewState.Error).text)
+                is MainViewModel.MainViewState.Error -> {
+                    ErrorScreen(
+                        modifier = Modifier.padding(innerPadding),
+                        viewState = viewState as MainViewModel.MainViewState.Error
+                    )
+                }
             }
         }
     }
+}
+
+@Composable
+private fun InputScreen(
+    modifier: Modifier = Modifier,
+    getRecipe: (ByteArray, MutableState<String>) -> Unit
+) {
+    val input = remember { mutableStateOf("") }
+    val state = rememberPeekabooCameraState(onCapture = {
+        it?.let { image ->
+            getRecipe(image, input)
+        }
+    })
+    Column(modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+        TextField(
+            value = input.value,
+            onValueChange = { input.value = it },
+            label = { Text("Enter available products") }
+        )
+        Button(onClick = {
+            state.capture()
+        }) {
+            Text("Take photo")
+        }
+        PeekabooCamera(
+            state = state,
+            modifier = Modifier.fillMaxSize(),
+            permissionDeniedContent = {
+                Text("Permission denied")
+            },
+        )
+    }
+}
+
+@Composable
+private fun ProgressScreen(modifier: Modifier = Modifier) {
+    Box(modifier.fillMaxSize()) {
+        CircularProgressIndicator(Modifier.align(Alignment.Center))
+    }
+}
+
+@Composable
+private fun RecipeScreen(modifier: Modifier = Modifier, output: Output) {
+    var selectedTabIndex by remember { mutableStateOf(0) }
+    val tabs = listOf("Groceries", "Recipe")
+    Column(modifier = modifier) {
+        TabRow(selectedTabIndex = selectedTabIndex) {
+            tabs.forEachIndexed { index, title ->
+                Tab(
+                    selected = selectedTabIndex == index,
+                    onClick = { selectedTabIndex = index },
+                    text = { Text(text = title) }
+                )
+            }
+        }
+        when (selectedTabIndex) {
+            0 -> GroceriesCard(groceries = output.groceries)
+            1 -> RecipeCard(recipe = output.recipe)
+        }
+    }
+}
+
+@Composable
+private fun ErrorScreen(
+    modifier: Modifier = Modifier,
+    viewState: MainViewModel.MainViewState.Error
+) {
+    Text(modifier = modifier, text = viewState.text)
 }

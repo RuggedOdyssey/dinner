@@ -5,6 +5,7 @@ import data.dto.CandidatesResponse
 import data.dto.Content
 import data.dto.GeminiPromptRequest
 import data.dto.InlineData
+import data.dto.Output
 import data.dto.Part
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.logging.DEFAULT
@@ -43,7 +44,7 @@ class VertexService {
         ignoreUnknownKeys = true
     }
 
-    suspend fun getGeminiResponse(encodedImage: String, prompt: String): Result<String> {
+    suspend fun getGeminiResponse(encodedImage: String, prompt: String): Result<Output> {
         val builder = HttpRequestBuilder()
 
         builder.url("https://${API_ENDPOINT}/v1/projects/${PROJECT_ID}/locations/${LOCATION_ID}/publishers/google/models/${MODEL_ID}:streamGenerateContent")
@@ -58,8 +59,8 @@ class VertexService {
         println(response.bodyAsText())
         return if (response.status.value in 200..299) {
             val result = json.decodeFromString<List<CandidatesResponse>>(response.bodyAsText())
-            val responseText = formatResponse(result)
-            Result.success(responseText)
+            val output = formatResponse(result)
+            Result.success(output)
         } else {
             Result.failure(Exception(response.bodyAsText()))
         }
@@ -81,19 +82,19 @@ class VertexService {
         )
     }
 
-    // TODO fix formatting for different parts of responses
+    private fun String.toOutput() = Json.decodeFromString<Output>(this)
     private fun formatResponse(result: List<CandidatesResponse>) = result.joinToString("\n") { response ->
         response.candidates.joinToString("\n") { candidate ->
             candidate.content.parts.joinToString("\n") { part ->
                 part.text ?: ""
             }
         }
-    }
+    }.toOutput()
 
     private companion object {
         const val API_ENDPOINT = "us-central1-aiplatform.googleapis.com"
         const val PROJECT_ID = "whats-for-dinner-416112"
-        const val LOCATION_ID = "us-central1"
+        const val LOCATION_ID = "europe-west3"
         const val MODEL_ID = "gemini-1.5-flash-001"
     }
 }
