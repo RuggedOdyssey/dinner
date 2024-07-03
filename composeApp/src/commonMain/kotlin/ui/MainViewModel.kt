@@ -3,6 +3,7 @@ package ui
 import androidx.compose.runtime.MutableState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import data.dto.Output
 import domain.GetGeminiRecipeUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
@@ -26,10 +27,14 @@ class MainViewModel : ViewModel() {
         }
     }
 
+    fun back() {
+        state.value = MainViewState.Input
+    }
+
     sealed interface MainViewState {
         data object Input : MainViewState
         data object Loading : MainViewState
-        data class Success(val result: String) : MainViewState
+        data class Success(val result: Output) : MainViewState
         data class Error(val text: String) : MainViewState
     }
 }
