@@ -1,0 +1,27 @@
+#!/bin/bash
+
+# Get the token
+TOKEN=$(gcloud auth print-access-token)
+
+# File to modify
+file="local.properties"
+temp="temp.properties"
+
+# Line to remove
+line_to_remove="VERTEX_TOKEN"
+
+# Line to append
+new_line="VERTEX_TOKEN=$TOKEN"
+
+# Remove the line with sed
+sed "/$line_to_remove/d" "$file" > $temp
+
+# Append the new line
+echo "$new_line" >> "$temp"
+
+rm $file
+mv $temp $file
+
+echo "File modified successfully. Building"
+
+./gradlew generateBuildKonfig

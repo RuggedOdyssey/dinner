@@ -23,6 +23,6 @@ class GetGeminiRecipeUseCase(private val service: VertexService = VertexService(
             "Given the image of a takeaway dish, write a recipe that can easily be made at home and include the following ingredients:\n"
         const val PROMPT_WRAPPER_SUFFIX =
             "\nThen provide grocery list of the additional ingredients with there quantities in metric, which is needed for the recipe. exclude the ingredients I listed already."
-        const val FORMAT_REQUEST = "\nformat the response in a JSON object in the following format\n Do not output markdown\n"
+        const val FORMAT_REQUEST = "\nformat the response in a valid JSON object with all brackets matching in the following format\n Do not output markdown\n"
     }
 }
