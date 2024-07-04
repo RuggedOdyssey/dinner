@@ -1,4 +1,9 @@
-This is a Kotlin Multiplatform project targeting Android, iOS.
+# OK Gemini, what's for dinner?
+
+This is the companion app for the talk titled `OK Gemini, what's for dinner?`
+It is a Kotlin Multiplatform project targeting Android, iOS. It uses multimodal Gemini LLM access to provide a grocery list and a recipe from a photo.
+
+Find the [slides](ok_gemini_slides.pdf) in the root directory/
 
 * `/composeApp` is for code that will be shared across your Compose Multiplatform applications.
   It contains several subfolders:
@@ -19,7 +24,6 @@ You need a token to access the api
 
 Prerequisites to run:
 1. Download gcloud CLI (using brew gcloud command)
-2. Run gcloud auth print-access-token
-3. Copy the token into local.properties in the format below  
-   `VERTEX_TOKEN=<insert your token here>`
-4. Run the command `./gradlew generateBuildKonfig` to read the token from your local.properties an include it in the code
+2. Make the script `token` in the root directory excecutable `chmod 755 token`
+3. Run the script `./token` It will use gcloud to print the token, copy it into local properties and rebuild the `BuildKonfig file`
+4. Build and run the app
