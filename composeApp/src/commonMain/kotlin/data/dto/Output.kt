@@ -3,16 +3,16 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Output(
-    val groceries: List<String>,
-    val recipe: Recipe
+    val groceries: List<String> = emptyList(),
+    val recipe: Recipe = Recipe()
 )
 
 @Serializable
 data class Recipe(
-    val description: String,
-    val ingredients: List<String>,
-    val steps: List<String>,
-    val title: String
+    val description: String = "",
+    val ingredients: List<String> = emptyList(),
+    val steps: List<String> = emptyList(),
+    val title: String = ""
 )
 
 const val outputFormat = """

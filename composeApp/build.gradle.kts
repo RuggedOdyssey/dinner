@@ -60,7 +60,6 @@ kotlin {
             implementation(libs.ktor.client.content.negotiation)
             implementation(libs.ktor.serialization.kotlinx.json)
             implementation(libs.ktor.client.logging)
-//            implementation ("com.google.cloud:google-cloud-vertexai:0.4.0")
         }
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)

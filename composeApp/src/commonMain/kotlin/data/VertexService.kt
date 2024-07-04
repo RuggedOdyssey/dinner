@@ -59,8 +59,11 @@ class VertexService {
         println(response.bodyAsText())
         return if (response.status.value in 200..299) {
             val result = json.decodeFromString<List<CandidatesResponse>>(response.bodyAsText())
-            val output = formatResponse(result)
-            Result.success(output)
+            try {
+                Result.success(formatResponse(result))
+            } catch (e:Exception) {
+                Result.failure(e)
+            }
         } else {
             Result.failure(Exception(response.bodyAsText()))
         }
@@ -82,7 +85,7 @@ class VertexService {
         )
     }
 
-    private fun String.toOutput() = Json.decodeFromString<Output>(this)
+    private fun String.toOutput() = Json{ ignoreUnknownKeys = true }.decodeFromString<Output>(this)
     private fun formatResponse(result: List<CandidatesResponse>) = result.joinToString("\n") { response ->
         response.candidates.joinToString("\n") { candidate ->
             candidate.content.parts.joinToString("\n") { part ->
