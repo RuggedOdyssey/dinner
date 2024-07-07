@@ -1,4 +1,4 @@
-package com.handen.whatsfordinner
+package net.ruggedodyssey.whatsfordinner
 
 import ui.MainScreen
 import android.os.Bundle

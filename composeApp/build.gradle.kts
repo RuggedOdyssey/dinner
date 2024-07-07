@@ -68,7 +68,7 @@ kotlin {
 }
 
 android {
-    namespace = "com.handen.whatsfordinner"
+    namespace = "net.ruggedodyssey.whatsfordinner"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
@@ -104,7 +104,7 @@ android {
     }
 }
 buildkonfig {
-    packageName = "com.handen.whatsfordinner"
+    packageName = "net.ruggedodyssey.whatsfordinner"
 
     defaultConfigs {
         val TOKEN: String = gradleLocalProperties(rootDir).getProperty("VERTEX_TOKEN")
@@ -116,4 +116,3 @@ buildkonfig {
         buildConfigField(STRING, "TOKEN", TOKEN)
     }
 }
-

@@ -1,6 +1,6 @@
 package data
 
-import com.handen.whatsfordinner.BuildKonfig
+import net.ruggedodyssey.whatsfordinner.BuildKonfig
 import data.dto.CandidatesResponse
 import data.dto.Content
 import data.dto.GeminiPromptRequest
