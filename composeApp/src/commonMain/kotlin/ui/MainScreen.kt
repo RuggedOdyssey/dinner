@@ -4,9 +4,13 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.Button
 import androidx.compose.material.CircularProgressIndicator
@@ -49,7 +53,10 @@ fun MainScreen() {
         val modelType by viewModel.modelType.collectAsState()
         val showBack by remember { derivedStateOf { viewState !is MainViewModel.MainViewState.Input } }
         val screenTitle by remember { derivedStateOf { if (!showBack) "What's for dinner?" else "" } }
+
+        // Use WindowInsets.safeDrawing for edge-to-edge display
         Scaffold(
+            modifier = Modifier.fillMaxSize(),
             topBar = {
                 TopAppBar(
                     title = { Text(screenTitle) },
@@ -62,9 +69,15 @@ fun MainScreen() {
                                 )
                             }
                         }
-                    }
+                    },
+                    // Apply top insets to the TopAppBar
+                    modifier = Modifier.padding(
+                        top = WindowInsets.systemBars.asPaddingValues().calculateTopPadding()
+                    )
                 )
-            }
+            },
+            // Set contentPadding to handle system bars
+            contentColor = MaterialTheme.colors.onBackground
 
         ) { innerPadding ->
             when (viewState) {
@@ -186,7 +199,11 @@ private fun InputScreen(
         // Floating Action Button at the bottom center
         FloatingActionButton(
             onClick = { state.capture() },
-            modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 16.dp)
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(
+                    bottom = WindowInsets.systemBars.asPaddingValues().calculateBottomPadding() + 16.dp
+                )
         ) {
             Text("📷")
         }
