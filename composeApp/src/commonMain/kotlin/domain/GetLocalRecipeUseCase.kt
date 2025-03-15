@@ -2,11 +2,13 @@ package domain
 
 import data.dto.Output
 import data.dto.Recipe
+import data.dto.toOutput
 import data.mediapipe.LLMFactory
 import data.mediapipe.LLMProcessor
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.first
+import domain.RecipePrompt
 
 class GetLocalRecipeUseCase(private val llmFactory: LLMFactory) : RecipeUseCase {
     private val llmProcessor: LLMProcessor by lazy { llmFactory.createLLMProcessor() }
@@ -24,7 +26,8 @@ class GetLocalRecipeUseCase(private val llmFactory: LLMFactory) : RecipeUseCase 
             val recipeText = getRecipe(ingredients).first { it != "Loading..." && !it.contains("Downloading model") }
 
             // Parse the recipe text into an Output object
-            val output = parseRecipeText(recipeText, ingredients)
+//            val output = parseRecipeText(recipeText, ingredients)
+            val output = recipeText.toOutput()
             Result.success(output)
         } catch (e: Exception) {
             Result.failure(e)
@@ -35,7 +38,7 @@ class GetLocalRecipeUseCase(private val llmFactory: LLMFactory) : RecipeUseCase 
      * Original method for getting a recipe based on ingredients.
      * Returns a flow of strings representing the recipe generation progress and result.
      */
-    suspend fun getRecipe(ingredients: List<String>): Flow<String> = flow {
+    fun getRecipe(ingredients: List<String>): Flow<String> = flow {
         emit("Loading...")
 
         // Check if model is available, download if needed
@@ -45,17 +48,7 @@ class GetLocalRecipeUseCase(private val llmFactory: LLMFactory) : RecipeUseCase 
         }
 
         val ingredientsText = ingredients.joinToString(", ")
-        val prompt = """
-            Given these ingredients: $ingredientsText
-
-            Generate a recipe with:
-            1. A creative title
-            2. Ingredients list with measurements
-            3. Step-by-step cooking instructions
-            4. Estimated cooking time
-
-            Keep the recipe concise and easy to follow.
-        """.trimIndent()
+        val prompt = RecipePrompt.makePrompt(ingredientsText)
 
         val response = llmProcessor.generateText(prompt)
         emit(response)
@@ -65,6 +58,7 @@ class GetLocalRecipeUseCase(private val llmFactory: LLMFactory) : RecipeUseCase 
      * Parse the recipe text into an Output object.
      */
     private fun parseRecipeText(recipeText: String, originalIngredients: List<String>): Output {
+        // TODO this is doing weird things, debug needed
         // Simple parsing logic - in a real app, you'd want more robust parsing
         val lines = recipeText.split("\n")
         val title = lines.firstOrNull() ?: "Recipe"

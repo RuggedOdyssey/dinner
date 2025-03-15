@@ -1,5 +1,6 @@
 package data.dto
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 
 @Serializable
 data class Output(
@@ -26,3 +27,5 @@ output: {
     }
 }
 """
+
+fun String.toOutput() = Json { ignoreUnknownKeys = true }.decodeFromString<Output>(this)
