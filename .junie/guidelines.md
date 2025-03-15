@@ -4,8 +4,6 @@
 
 "OK Gemini, what's for dinner?" is a Kotlin Multiplatform application that demonstrates the capabilities of Google's Gemini multimodal Large Language Model (LLM). The app allows users to take photos of ingredients and receive suggested recipes and grocery lists based on the image content.
 
-This is the companion app for the talk titled "OK Gemini, what's for dinner?". Find the [slides](ok_gemini_slides.pdf) in the root directory.
-
 ### Key Features
 - Photo-to-recipe conversion using Gemini LLM
 - Grocery list generation based on image analysis
