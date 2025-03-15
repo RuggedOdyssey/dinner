@@ -4,7 +4,7 @@
 
 "OK Gemini, what's for dinner?" is a Kotlin Multiplatform application that demonstrates the capabilities of Google's Gemini multimodal Large Language Model (LLM). The app allows users to take photos of ingredients and receive suggested recipes and grocery lists based on the image content.
 
-This is the companion app for the talk titled "OK Gemini, what's for dinner?" and for the talk "Dinner for two with Gemini". Find the [ok gemini slides](ok_gemini_slides.pdf) and [dinner for two slides](dinner_for_two.pdf)vin the root directory.
+This is the companion app for the talk titled "OK Gemini, what's for dinner?" and for the talk "Dinner for two with Gemini". Find the [ok gemini slides](ok_gemini_slides.pdf) and [dinner for two slides](dinner_for_two.pdf) in the root directory.
 
 ### Key Features
 - Photo-to-recipe conversion using Gemini LLM
@@ -15,9 +15,6 @@ This is the companion app for the talk titled "OK Gemini, what's for dinner?" an
 - **Kotlin Multiplatform**: For shared code across platforms
 - **Compose Multiplatform**: For UI components
 - **Google Gemini API**: For multimodal LLM capabilities
-
-> ℹ️ **Info**: The iOS app needs some attention it doesn't run at the moment.
-
 - **SwiftUI**: For iOS-specific UI components
 
 ## Project Structure
@@ -29,6 +26,8 @@ The project follows the standard Kotlin Multiplatform structure:
   - Platform-specific folders for platform-specific implementations
 
 - `/iosApp`: iOS application entry point and SwiftUI code
+
+> ℹ️ **Note**: The iOS app needs some attention as it doesn't run at the moment.
 
 ## Development Setup
 
