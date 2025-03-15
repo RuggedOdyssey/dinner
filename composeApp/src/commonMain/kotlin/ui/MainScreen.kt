@@ -41,12 +41,12 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Composable
 @Preview
 fun MainScreen() {
-
     val viewModel = remember { MainViewModel() }
 
     MaterialTheme {
         val viewState by viewModel.state.collectAsState()
         val isOfflineMode by viewModel.isOfflineMode.collectAsState()
+        val useOnDeviceModel by viewModel.useOnDeviceModel.collectAsState()
         val showBack by remember { derivedStateOf { viewState !is MainViewModel.MainViewState.Input } }
         val screenTitle by remember { derivedStateOf { if (!showBack) "What's for dinner?" else "" } }
         Scaffold(
@@ -73,7 +73,9 @@ fun MainScreen() {
                         modifier = Modifier.padding(innerPadding),
                         getRecipe = viewModel::getRecipe,
                         isOfflineMode = isOfflineMode,
-                        toggleOfflineMode = viewModel::toggleOfflineMode
+                        toggleOfflineMode = viewModel::toggleOfflineMode,
+                        useOnDeviceModel = useOnDeviceModel,
+                        toggleModelType = viewModel::toggleModelType
                     )
                 }
 
@@ -106,7 +108,9 @@ private fun InputScreen(
     modifier: Modifier = Modifier,
     getRecipe: (ByteArray, MutableState<String>) -> Unit,
     isOfflineMode: Boolean,
-    toggleOfflineMode: () -> Unit
+    toggleOfflineMode: () -> Unit,
+    useOnDeviceModel: Boolean,
+    toggleModelType: () -> Unit
 ) {
     val input = remember { mutableStateOf("") }
     val state = rememberPeekabooCameraState(onCapture = {
@@ -114,6 +118,7 @@ private fun InputScreen(
             getRecipe(image, input)
         }
     })
+    
     Column(modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
         TextField(
             value = input.value,
@@ -141,6 +146,25 @@ private fun InputScreen(
             Spacer(modifier = Modifier.width(8.dp))
 
             Text(text = if (isOfflineMode) "Offline" else "Online")
+        }
+        
+        // Add a row for on-device model toggle
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(vertical = 4.dp)
+        ) {
+            Text(text = "Model: ")
+            
+            Spacer(modifier = Modifier.width(8.dp))
+            
+            Switch(
+                checked = useOnDeviceModel,
+                onCheckedChange = { toggleModelType() }
+            )
+            
+            Spacer(modifier = Modifier.width(8.dp))
+            
+            Text(text = if (useOnDeviceModel) "On-device" else "Cloud")
         }
 
         PeekabooCamera(
