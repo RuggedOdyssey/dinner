@@ -8,6 +8,7 @@ import java.io.File
 
 // Mock implementation of the MediaPipe TextGenerator
 // In a real app, this would use the actual MediaPipe library
+//TODO claude claude claude, ok I need to put the real one in here
 class MediaPipeProcessor(private val context: Context) : LLMProcessor {
     // Mock model state
     private var modelInitialized = false
