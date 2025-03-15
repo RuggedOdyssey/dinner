@@ -9,28 +9,64 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import data.dto.Recipe
+import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 fun RecipeCard(modifier: Modifier = Modifier, recipe:Recipe) {
-    LazyColumn(modifier = modifier) {
+    LazyColumn(modifier = modifier.padding(16.dp)) {
         item {
             Text(
                 text = recipe.title,
-                style = MaterialTheme.typography.h4
+                style = MaterialTheme.typography.h4,
+                modifier = Modifier.padding(bottom = 12.dp)
             )
         }
         item {
-            Text(text = recipe.description)
+            Text(
+                text = recipe.description,
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
         }
         items(recipe.ingredients) { item ->
-            Text(text = item, modifier = Modifier.padding(8.dp))
+            Text(text = item, modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp))
         }
         item {
-            Text(text = "Steps",
-                style = MaterialTheme.typography.h4)
+            Text(
+                text = "Steps",
+                style = MaterialTheme.typography.h4,
+                modifier = Modifier.padding(top = 16.dp, bottom = 8.dp)
+            )
         }
         items(recipe.steps) { item ->
-            Text(text = item, modifier = Modifier.padding(8.dp))
+            Text(text = item, modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp))
         }
     }
+}
+
+@Composable
+@Preview
+fun RecipeCardPreview() {
+    val sampleRecipe = Recipe(
+        title = "Pancakes",
+        description = "Fluffy and delicious pancakes that are perfect for breakfast or brunch.",
+        ingredients = listOf(
+            "250g flour",
+            "2 eggs",
+            "1 cup milk",
+            "2 tbsp sugar",
+            "1 tsp baking powder",
+            "1/2 tsp salt",
+            "2 tbsp melted butter"
+        ),
+        steps = listOf(
+            "1. In a large bowl, mix flour, sugar, baking powder, and salt.",
+            "2. In another bowl, beat the eggs, then add milk and melted butter.",
+            "3. Pour the wet ingredients into the dry ingredients and stir until just combined.",
+            "4. Heat a lightly oiled frying pan over medium-high heat.",
+            "5. Pour 1/4 cup of batter onto the pan for each pancake.",
+            "6. Cook until bubbles form on the surface, then flip and cook until golden brown.",
+            "7. Serve hot with maple syrup, fresh fruits, or whipped cream."
+        )
+    )
+    RecipeCard(recipe = sampleRecipe)
 }
