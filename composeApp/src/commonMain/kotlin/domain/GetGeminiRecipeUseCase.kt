@@ -2,6 +2,7 @@ package domain
 
 import data.VertexService
 import data.dto.Output
+import data.dto.Recipe
 import data.dto.outputFormat
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
@@ -9,10 +10,33 @@ import kotlin.io.encoding.ExperimentalEncodingApi
 @OptIn(ExperimentalEncodingApi::class)
 class GetGeminiRecipeUseCase(private val service: VertexService = VertexService()) {
 
-    suspend operator fun invoke(photo: ByteArray, availableProducts: String): Result<Output> {
-        val encodedBitmap = Base64.encode(photo)
-        val prompt = makePrompt(availableProducts)
-        return service.getGeminiResponse(encodedBitmap, prompt)
+    suspend operator fun invoke(photo: ByteArray, availableProducts: String, isOfflineMode: Boolean = false): Result<Output> {
+        return if (isOfflineMode) {
+            // Return a mock response in offline mode
+            Result.success(createMockOutput(availableProducts))
+        } else {
+            // Use the online service in online mode
+            val encodedBitmap = Base64.encode(photo)
+            val prompt = makePrompt(availableProducts)
+            service.getGeminiResponse(encodedBitmap, prompt)
+        }
+    }
+
+    private fun createMockOutput(availableProducts: String): Output {
+        val ingredients = availableProducts.split(",").map { it.trim() }.filter { it.isNotEmpty() }
+        return Output(
+            groceries = listOf("250g flour", "2 eggs", "500ml milk", "1 tsp salt", "2 tbsp olive oil"),
+            recipe = Recipe(
+                title = "Mock Recipe with ${ingredients.joinToString(", ")}",
+                description = "This is a mock recipe generated in offline mode.",
+                ingredients = ingredients + listOf("250g flour", "2 eggs", "500ml milk", "1 tsp salt", "2 tbsp olive oil"),
+                steps = listOf(
+                    "Mix all ingredients in a bowl.",
+                    "Cook on medium heat for 10 minutes.",
+                    "Serve hot and enjoy your meal!"
+                )
+            )
+        )
     }
 
     private fun makePrompt(availableProducts: String) =
