@@ -38,7 +38,7 @@ kotlin {
             implementation(libs.androidx.activity.compose)
             implementation(libs.ktor.client.okhttp)
             implementation(libs.kotlinx.coroutines.android)
-            
+
             // MediaPipe dependencies for on-device LLM
             // Note: In a real project, you would use the actual MediaPipe Task Library
             // This is a placeholder - the actual implementation would use:
@@ -111,12 +111,12 @@ buildkonfig {
     packageName = "net.ruggedodyssey.whatsfordinner"
 
     defaultConfigs {
-        val TOKEN: String = gradleLocalProperties(rootDir).getProperty("VERTEX_TOKEN")
+        val token: String = gradleLocalProperties(rootDir, providers).getProperty("VERTEX_TOKEN")
 
-        require(TOKEN.isNotEmpty()) {
+        require(token.isNotEmpty()) {
             "Register your api key from developer and place it in local.properties as `VERTEX_TOKEN`"
         }
 
-        buildConfigField(STRING, "TOKEN", TOKEN)
+        buildConfigField(STRING, "TOKEN", token)
     }
 }
