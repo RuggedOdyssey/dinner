@@ -41,7 +41,7 @@ class MainViewModel : ViewModel() {
             ModelType.ON_DEVICE -> {
                 // Use on-device LLM model
                 val ingredients = input.value.split(",").map { it.trim() }.filter { it.isNotEmpty() }
-                getLocalRecipe.getRecipe(ingredients).collectLatest { response ->
+                getLocalRecipe.getRecipe(image, ingredients).collectLatest { response ->
                     if (response == "Loading..." || response.contains("Downloading model")) {
                         state.value = MainViewState.Loading
                     } else {

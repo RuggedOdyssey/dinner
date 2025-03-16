@@ -28,7 +28,7 @@ class MediaPipeProcessor(private val context: Context) : LLMProcessor {
         return modelFile.absolutePath
     }
     
-    override suspend fun generateText(prompt: String): String {
+    override suspend fun generateText(photo: ByteArray, prompt: String): String {
         return withContext(Dispatchers.IO) {
             try {
                 if (!isModelAvailable()) {

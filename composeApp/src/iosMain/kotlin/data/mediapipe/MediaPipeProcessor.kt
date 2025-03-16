@@ -10,7 +10,7 @@ class MediaPipeProcessor : LLMProcessor {
     // This is a simplified implementation - in a real app, you would need to
     // implement the bridge to the Swift MediapipeLLMInferenceDelegate
     
-    override suspend fun generateText(prompt: String): String {
+    override suspend fun generateText(photo: ByteArray, prompt: String): String {
         return withContext(Dispatchers.Default) {
             // In a real implementation, this would call the Swift delegate
             // For now, we'll return a mock response

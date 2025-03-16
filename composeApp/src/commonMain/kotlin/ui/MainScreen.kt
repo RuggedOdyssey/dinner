@@ -52,14 +52,37 @@ fun MainScreen() {
         val viewState by viewModel.state.collectAsState()
         val modelType by viewModel.modelType.collectAsState()
         val showBack by remember { derivedStateOf { viewState !is MainViewModel.MainViewState.Input } }
-        val screenTitle by remember { derivedStateOf { if (!showBack) "What's for dinner?" else "" } }
+        val screenTitle = "What's for dinner?"
 
         // Use WindowInsets.safeDrawing for edge-to-edge display
         Scaffold(
             modifier = Modifier.fillMaxSize(),
             topBar = {
                 TopAppBar(
-                    title = { Text(screenTitle) },
+                    title = { 
+                        Column {
+                            Text(screenTitle)
+                            if (!showBack) {
+                                // Show the threeway tab in the app bar when in Input state
+                                val modelTypes = listOf(ModelType.MOCK, ModelType.ON_DEVICE, ModelType.CLOUD)
+                                val modelTypeLabels = listOf("Mock", "On-device", "Cloud")
+                                val selectedTabIndex = modelTypes.indexOf(modelType)
+
+                                TabRow(
+                                    selectedTabIndex = selectedTabIndex,
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    modelTypes.forEachIndexed { index, type ->
+                                        Tab(
+                                            selected = modelType == type,
+                                            onClick = { viewModel.setModelType(type) },
+                                            text = { Text(text = modelTypeLabels[index]) }
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    },
                     navigationIcon = {
                         if (showBack) {
                             IconButton(onClick = viewModel::back) {
@@ -70,10 +93,11 @@ fun MainScreen() {
                             }
                         }
                     },
-                    // Apply top insets to the TopAppBar
-                    modifier = Modifier.padding(
-                        top = WindowInsets.systemBars.asPaddingValues().calculateTopPadding()
-                    )
+                    // Apply top insets to the TopAppBar and make it taller
+                    modifier = Modifier
+                        .padding(top = WindowInsets.systemBars.asPaddingValues().calculateTopPadding())
+                        .padding(vertical = 8.dp),
+                    elevation = 8.dp
                 )
             },
             // Set contentPadding to handle system bars
@@ -133,59 +157,9 @@ private fun InputScreen(
             TextField(
                 value = input.value,
                 onValueChange = { input.value = it },
-                label = { Text("Enter available products") }
+                label = { Text("Enter available products") },
+                modifier = Modifier.padding(top = 16.dp)
             )
-
-            // Three-state radio button in a horizontal row
-            Row(
-                modifier = Modifier.padding(vertical = 4.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                // Radio button for Mock
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(horizontal = 8.dp)
-                ) {
-                    RadioButton(
-                        selected = modelType == ModelType.MOCK,
-                        onClick = { setModelType(ModelType.MOCK) }
-                    )
-
-                    Spacer(modifier = Modifier.width(4.dp))
-
-                    Text(text = "Mock")
-                }
-
-                // Radio button for On-device
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(horizontal = 8.dp)
-                ) {
-                    RadioButton(
-                        selected = modelType == ModelType.ON_DEVICE,
-                        onClick = { setModelType(ModelType.ON_DEVICE) }
-                    )
-
-                    Spacer(modifier = Modifier.width(4.dp))
-
-                    Text(text = "On-device")
-                }
-
-                // Radio button for Cloud
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(horizontal = 8.dp)
-                ) {
-                    RadioButton(
-                        selected = modelType == ModelType.CLOUD,
-                        onClick = { setModelType(ModelType.CLOUD) }
-                    )
-
-                    Spacer(modifier = Modifier.width(4.dp))
-
-                    Text(text = "Cloud")
-                }
-            }
 
             PeekabooCamera(
                 state = state,
