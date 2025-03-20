@@ -59,30 +59,7 @@ fun MainScreen() {
             modifier = Modifier.fillMaxSize(),
             topBar = {
                 TopAppBar(
-                    title = { 
-                        Column {
-                            Text(screenTitle)
-                            if (!showBack) {
-                                // Show the threeway tab in the app bar when in Input state
-                                val modelTypes = listOf(ModelType.MOCK, ModelType.ON_DEVICE, ModelType.CLOUD)
-                                val modelTypeLabels = listOf("Mock", "On-device", "Cloud")
-                                val selectedTabIndex = modelTypes.indexOf(modelType)
-
-                                TabRow(
-                                    selectedTabIndex = selectedTabIndex,
-                                    modifier = Modifier.fillMaxWidth()
-                                ) {
-                                    modelTypes.forEachIndexed { index, type ->
-                                        Tab(
-                                            selected = modelType == type,
-                                            onClick = { viewModel.setModelType(type) },
-                                            text = { Text(text = modelTypeLabels[index]) }
-                                        )
-                                    }
-                                }
-                            }
-                        }
-                    },
+                    title = { Text(screenTitle) },
                     navigationIcon = {
                         if (showBack) {
                             IconButton(onClick = viewModel::back) {
@@ -96,8 +73,6 @@ fun MainScreen() {
                     // Apply top insets to the TopAppBar and make it taller
                     modifier = Modifier
                         .padding(top = WindowInsets.systemBars.asPaddingValues().calculateTopPadding())
-                        .padding(vertical = 8.dp),
-                    elevation = 8.dp
                 )
             },
             // Set contentPadding to handle system bars
@@ -154,6 +129,24 @@ private fun InputScreen(
 
     Box(modifier.fillMaxSize()) {
         Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+            // Threeway tab for model selection
+            val modelTypes = listOf(ModelType.MOCK, ModelType.ON_DEVICE, ModelType.CLOUD)
+            val modelTypeLabels = listOf("Mock", "On-device", "Cloud")
+            val selectedTabIndex = modelTypes.indexOf(modelType)
+
+            TabRow(
+                selectedTabIndex = selectedTabIndex,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                modelTypes.forEachIndexed { index, type ->
+                    Tab(
+                        selected = modelType == type,
+                        onClick = { setModelType(type) },
+                        text = { Text(text = modelTypeLabels[index]) }
+                    )
+                }
+            }
+
             TextField(
                 value = input.value,
                 onValueChange = { input.value = it },
