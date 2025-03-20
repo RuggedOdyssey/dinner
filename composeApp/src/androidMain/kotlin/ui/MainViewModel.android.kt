@@ -1,6 +1,5 @@
 package ui
 
-import android.app.Application
 import data.mediapipe.LLMFactory
 import net.ruggedodyssey.whatsfordinner.MainActivity
 
