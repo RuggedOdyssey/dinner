@@ -42,6 +42,7 @@ import com.preat.peekaboo.ui.camera.PeekabooCamera
 import com.preat.peekaboo.ui.camera.rememberPeekabooCameraState
 import data.dto.Output
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import ui.CameraIcon
 
 @Composable
 @Preview
@@ -172,7 +173,7 @@ private fun InputScreen(
                     bottom = WindowInsets.systemBars.asPaddingValues().calculateBottomPadding() + 16.dp
                 )
         ) {
-            Text("📷")
+            CameraIcon()
         }
     }
 }
