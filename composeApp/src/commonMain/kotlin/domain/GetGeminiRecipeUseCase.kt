@@ -10,10 +10,10 @@ import domain.RecipePrompt
 @OptIn(ExperimentalEncodingApi::class)
 class GetGeminiRecipeUseCase(private val service: VertexService = VertexService()) : RecipeUseCase {
 
-    override suspend operator fun invoke(photo: ByteArray, availableProducts: String): Result<Output> {
+    override suspend operator fun invoke(photo: ByteArray, availableProducts: String, recipeTitle: String?): Result<Output> {
         // Use the online service
         val encodedBitmap = Base64.encode(photo)
-        val prompt = RecipePrompt.makePrompt(availableProducts)
+        val prompt = RecipePrompt.makePrompt(availableProducts, recipeTitle)
         return service.getGeminiResponse(encodedBitmap, prompt)
     }
 }

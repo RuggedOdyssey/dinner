@@ -17,13 +17,13 @@ class GetLocalRecipeUseCase(private val llmFactory: LLMFactory) : RecipeUseCase 
      * Implementation of the RecipeUseCase interface.
      * Processes the photo and available products to generate a recipe.
      */
-    override suspend operator fun invoke(photo: ByteArray, availableProducts: String): Result<Output> {
+    override suspend operator fun invoke(photo: ByteArray, availableProducts: String, recipeTitle: String?): Result<Output> {
         return try {
             // Parse ingredients from availableProducts
             val ingredients = availableProducts.split(",").map { it.trim() }.filter { it.isNotEmpty() }
 
             // Get recipe text using the existing getRecipe method
-            val recipeText = getRecipe(photo, ingredients).first { it != "Loading..." && !it.contains("Downloading model") }
+            val recipeText = getRecipe(photo, ingredients, recipeTitle).first { it != "Loading..." && !it.contains("Downloading model") }
 
             // Parse the recipe text into an Output object
             val output = recipeText.toOutput()
@@ -37,7 +37,7 @@ class GetLocalRecipeUseCase(private val llmFactory: LLMFactory) : RecipeUseCase 
      * Original method for getting a recipe based on ingredients.
      * Returns a flow of strings representing the recipe generation progress and result.
      */
-    fun getRecipe(photo: ByteArray, ingredients: List<String>): Flow<String> = flow {
+    fun getRecipe(photo: ByteArray, ingredients: List<String>, recipeTitle: String? = null): Flow<String> = flow {
         emit("Loading...")
 
         // Check if model is available, download if needed
@@ -47,7 +47,7 @@ class GetLocalRecipeUseCase(private val llmFactory: LLMFactory) : RecipeUseCase 
         }
 
         val ingredientsText = ingredients.joinToString(", ")
-        val prompt = RecipePrompt.makePrompt(ingredientsText)
+        val prompt = RecipePrompt.makePrompt(ingredientsText, recipeTitle)
 
         val response = llmProcessor.generateText(photo, prompt)
         emit(response)

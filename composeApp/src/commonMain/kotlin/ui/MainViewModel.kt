@@ -34,7 +34,7 @@ class MainViewModel : ViewModel() {
     private val getMockGeminiRecipe = GetMockGeminiRecipeUseCase()
     private val getLocalRecipe = GetLocalRecipeUseCase(createLLMFactory())
 
-    fun getRecipe(image: ByteArray, input: MutableState<String>) = viewModelScope.launch(Dispatchers.IO) {
+    fun getRecipe(image: ByteArray, input: MutableState<String>, recipeTitle: MutableState<String>? = null) = viewModelScope.launch(Dispatchers.IO) {
         state.value = MainViewState.Loading
 
         when (_modelType.value) {
@@ -48,7 +48,7 @@ class MainViewModel : ViewModel() {
                         // Parse the LLM output into our data structure
                         // This is a simplified parser - in a real app you'd want more robust parsing
                         val lines = response.split("\n")
-                        val title = lines.firstOrNull() ?: "Recipe"
+                        val title = recipeTitle?.value?.takeIf { it.isNotBlank() } ?: lines.firstOrNull() ?: "Recipe"
 
                         val ingredientsList = mutableListOf<String>()
                         val steps = mutableListOf<String>()
@@ -97,7 +97,7 @@ class MainViewModel : ViewModel() {
             }
             ModelType.MOCK -> {
                 // Use mock Gemini service
-                val result = getMockGeminiRecipe(image, input.value)
+                val result = getMockGeminiRecipe(image, input.value, recipeTitle?.value)
                 if (result.isSuccess) {
                     state.value = MainViewState.Success(result.getOrThrow())
                 } else {
@@ -107,7 +107,7 @@ class MainViewModel : ViewModel() {
             }
             ModelType.CLOUD -> {
                 // Use real Gemini service in online mode
-                val result = getGeminiRecipe(image, input.value)
+                val result = getGeminiRecipe(image, input.value, recipeTitle?.value)
                 if (result.isSuccess) {
                     state.value = MainViewState.Success(result.getOrThrow())
                 } else {

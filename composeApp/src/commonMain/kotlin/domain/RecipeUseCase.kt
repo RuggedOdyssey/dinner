@@ -11,7 +11,8 @@ interface RecipeUseCase {
      *
      * @param photo The photo containing ingredients or food items
      * @param availableProducts Additional text input about available products
+     * @param recipeTitle Optional title for the recipe
      * @return Result containing the Output with recipe and groceries information
      */
-    suspend operator fun invoke(photo: ByteArray, availableProducts: String): Result<Output>
+    suspend operator fun invoke(photo: ByteArray, availableProducts: String, recipeTitle: String? = null): Result<Output>
 }

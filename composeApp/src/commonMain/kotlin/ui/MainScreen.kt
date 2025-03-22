@@ -84,7 +84,9 @@ fun MainScreen() {
                 is MainViewModel.MainViewState.Input -> {
                     InputScreen(
                         modifier = Modifier.padding(innerPadding),
-                        getRecipe = viewModel::getRecipe,
+                        getRecipe = { image, input, recipeTitle -> 
+                            viewModel.getRecipe(image, input, recipeTitle)
+                        },
                         modelType = modelType,
                         setModelType = viewModel::setModelType
                     )
@@ -117,14 +119,15 @@ fun MainScreen() {
 @Composable
 private fun InputScreen(
     modifier: Modifier = Modifier,
-    getRecipe: (ByteArray, MutableState<String>) -> Unit,
+    getRecipe: (ByteArray, MutableState<String>, MutableState<String>?) -> Unit,
     modelType: ModelType,
     setModelType: (ModelType) -> Unit
 ) {
     val input = remember { mutableStateOf("") }
+    val recipeTitle = remember { mutableStateOf("") }
     val state = rememberPeekabooCameraState(onCapture = {
         it?.let { image ->
-            getRecipe(image, input)
+            getRecipe(image, input, if (modelType == ModelType.ON_DEVICE) recipeTitle else null)
         }
     })
 
@@ -154,6 +157,16 @@ private fun InputScreen(
                 label = { Text("Enter available products") },
                 modifier = Modifier.padding(top = 16.dp)
             )
+
+            // Only show recipe title field when on-device model is selected
+            if (modelType == ModelType.ON_DEVICE) {
+                TextField(
+                    value = recipeTitle.value,
+                    onValueChange = { recipeTitle.value = it },
+                    label = { Text("Enter recipe title") },
+                    modifier = Modifier.padding(top = 8.dp)
+                )
+            }
 
             PeekabooCamera(
                 state = state,

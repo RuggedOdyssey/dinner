@@ -5,17 +5,17 @@ import data.dto.Recipe
 
 class GetMockGeminiRecipeUseCase : RecipeUseCase {
 
-    override suspend operator fun invoke(photo: ByteArray, availableProducts: String): Result<Output> {
+    override suspend operator fun invoke(photo: ByteArray, availableProducts: String, recipeTitle: String?): Result<Output> {
         // Return a mock response
-        return Result.success(createMockOutput(availableProducts))
+        return Result.success(createMockOutput(availableProducts, recipeTitle))
     }
 
-    private fun createMockOutput(availableProducts: String): Output {
+    private fun createMockOutput(availableProducts: String, recipeTitle: String?): Output {
         val ingredients = availableProducts.split(",").map { it.trim() }.filter { it.isNotEmpty() }
         return Output(
             groceries = listOf("250g flour", "2 eggs", "500ml milk", "1 tsp salt", "2 tbsp olive oil"),
             recipe = Recipe(
-                title = "Mock Recipe with ${ingredients.joinToString(", ")}",
+                title = recipeTitle ?: "Mock Recipe with ${ingredients.joinToString(", ")}",
                 description = "This is a mock recipe generated in offline mode.",
                 ingredients = ingredients + listOf("250g flour", "2 eggs", "500ml milk", "1 tsp salt", "2 tbsp olive oil"),
                 steps = listOf(
