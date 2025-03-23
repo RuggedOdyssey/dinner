@@ -7,10 +7,7 @@ import com.google.mediapipe.tasks.genai.llminference.LlmInference.Backend
 enum class Model(
     val path: String,
     val url: String,
-    val licenseUrl: String,
-    val needsAuth: Boolean,
     val preferredBackend: Backend?,
-    //val uiState: UiState,
     val temperature: Float,
     val topK: Int,
     val topP: Float,
@@ -18,10 +15,16 @@ enum class Model(
     GEMMA3_CPU(
         path = "/data/local/tmp/gemma3-1b-it-int4.task",
         url = "https://huggingface.co/litert-community/Gemma3-1B-IT/resolve/main/gemma3-1b-it-int4.task",
-        licenseUrl = "https://huggingface.co/litert-community/Gemma3-1B-IT",
-        needsAuth = true,
         preferredBackend = Backend.CPU,
-        //uiState = GenericUiState(),
+        temperature = 1f,
+        topK = 64,
+        topP = 0.95f
+    ),
+
+    GEMMA2_CPU(
+        path = "/data/local/tmp/gemma2_q8_multi-prefill-seq_ekv1280.task",
+        url = "https://huggingface.co/litert-community/Gemma2-2B-IT/resolve/main/gemma2_q8_multi-prefill-seq_ekv1280.task",
+        preferredBackend = Backend.CPU,
         temperature = 1f,
         topK = 64,
         topP = 0.95f
@@ -29,10 +32,7 @@ enum class Model(
     GEMMA3_GPU(
         path = "/data/local/tmp/gemma3-1b-it-int4.task",
         url = "https://huggingface.co/litert-community/Gemma3-1B-IT/resolve/main/gemma3-1b-it-int4.task",
-        licenseUrl = "https://huggingface.co/litert-community/Gemma3-1B-IT",
-        needsAuth = true,
         preferredBackend = Backend.GPU,
-       // uiState = GenericUiState(),
         temperature = 1f,
         topK = 64,
         topP = 0.95f
@@ -48,15 +48,12 @@ enum class Model(
 //        topK = 40,
 //        topP = 0.7f
 //    ),
-//    PHI4_CPU(
-//        path = "/data/local/tmp/llm/phi4_q8_ekv1280.task",
-//        url = "https://huggingface.co/litert-community/Phi-4-mini-instruct/resolve/main/phi4_q8_ekv1280.task",
-//        licenseUrl = "",
-//        needsAuth = false,
-//        preferredBackend = null,
-//       // uiState = GenericUiState(),
-//        temperature = 0.0f,
-//        topK = 40,
-//        topP = 1.0f
-//    ),
+    PHI4_CPU(
+        path = "/data/local/tmp/phi4_q8_ekv1280.task",
+        url = "https://huggingface.co/litert-community/Phi-4-mini-instruct/resolve/main/phi4_q8_ekv1280.task",
+        preferredBackend = null,
+        temperature = 0.0f,
+        topK = 40,
+        topP = 1.0f
+    ),
 }
