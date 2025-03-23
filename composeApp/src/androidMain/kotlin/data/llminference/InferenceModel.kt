@@ -16,11 +16,6 @@ import kotlin.coroutines.resumeWithException
 /** The maximum number of tokens the model can process. */
 var MAX_TOKENS = 1024
 
-/**
- * An offset in tokens that we use to ensure that the model always has the
- * ability to respond when we compute the remaining context length.
- */
-//var DECODE_TOKEN_OFFSET = 256
 
 class ModelLoadFailException :
     Exception("Failed to load model, please try again")
@@ -36,14 +31,11 @@ class InferenceModel(private val context: Context) : LLMProcessor {
     private lateinit var llmInferenceSession: LlmInferenceSession
     private val TAG = InferenceModel::class.qualifiedName
 
-    // val uiState: UiState
-
     init {
         if (!modelExists(context)) {
             throw IllegalArgumentException("Model not found at path: ${model.path}")
         }
 
-        // uiState = model.uiState
         createEngine(context)
         createSession()
     }
@@ -131,19 +123,6 @@ class InferenceModel(private val context: Context) : LLMProcessor {
 
     companion object {
         var model: Model = Model.GEMMA3_CPU
-//        private var instance: InferenceModel? = null
-//
-//        fun getInstance(context: Context): InferenceModel {
-//            return if (instance != null) {
-//                instance!!
-//            } else {
-//                InferenceModel(context).also { instance = it }
-//            }
-//        }
-//
-//        fun resetInstance(context: Context): InferenceModel {
-//            return InferenceModel(context).also { instance = it }
-//        }
 
         fun modelPathFromUrl(context: Context): String {
             if (model.url.isNotEmpty()) {
