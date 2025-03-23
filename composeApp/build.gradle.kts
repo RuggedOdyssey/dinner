@@ -45,10 +45,7 @@ kotlin {
             implementation(libs.kotlinx.coroutines.android)
 
             // MediaPipe dependencies for on-device LLM
-            // Note: In a real project, you would use the actual MediaPipe Task Library
-            // This is a placeholder - the actual implementation would use:
-            // implementation("com.google.mediapipe:tasks-genai:latest-version")
-            // implementation("com.google.mediapipe:tasks-genai-text:latest-version")
+            implementation(libs.mediapipe.tasks.genai)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
