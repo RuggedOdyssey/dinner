@@ -1,11 +1,11 @@
-package data.mediapipe
+package data.llminference
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import platform.Foundation.NSBundle
 import platform.Foundation.NSFileManager
 
-class MediaPipeProcessor : LLMProcessor {
+class InferenceModel : LLMProcessor {
     // Bridge to Swift implementation
     // This is a simplified implementation - in a real app, you would need to
     // implement the bridge to the Swift MediapipeLLMInferenceDelegate

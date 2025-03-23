@@ -1,7 +1,7 @@
-package data.mediapipe
+package data.llminference
 
 actual class LLMFactory {
     actual fun createLLMProcessor(): LLMProcessor {
-        return MediaPipeProcessor()
+        return InferenceModel()
     }
 }

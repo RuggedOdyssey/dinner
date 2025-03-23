@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import data.dto.Output
 import data.dto.Recipe
-import data.mediapipe.LLMFactory
+import data.llminference.LLMFactory
 import domain.GetGeminiRecipeUseCase
 import domain.GetLocalRecipeUseCase
 import domain.GetMockGeminiRecipeUseCase

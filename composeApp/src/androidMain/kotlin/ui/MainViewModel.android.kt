@@ -1,6 +1,6 @@
 package ui
 
-import data.mediapipe.LLMFactory
+import data.llminference.LLMFactory
 import net.ruggedodyssey.whatsfordinner.MainActivity
 
 actual fun createLLMFactory(): LLMFactory {

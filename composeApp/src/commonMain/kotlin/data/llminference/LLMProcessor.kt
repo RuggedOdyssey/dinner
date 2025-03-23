@@ -1,4 +1,4 @@
-package data.mediapipe
+package data.llminference
 
 interface LLMProcessor {
     suspend fun generateText(photo: ByteArray, prompt: String): String

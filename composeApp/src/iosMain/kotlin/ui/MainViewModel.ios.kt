@@ -1,6 +1,6 @@
 package ui
 
-import data.mediapipe.LLMFactory
+import data.llminference.LLMFactory
 
 actual fun createLLMFactory(): LLMFactory {
     return LLMFactory()

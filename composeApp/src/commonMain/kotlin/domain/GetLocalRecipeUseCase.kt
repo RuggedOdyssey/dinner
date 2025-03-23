@@ -3,8 +3,8 @@ package domain
 import data.dto.Output
 import data.dto.Recipe
 import data.dto.toOutput
-import data.mediapipe.LLMFactory
-import data.mediapipe.LLMProcessor
+import data.llminference.LLMFactory
+import data.llminference.LLMProcessor
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.first
