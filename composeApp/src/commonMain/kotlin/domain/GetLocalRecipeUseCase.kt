@@ -23,7 +23,9 @@ class GetLocalRecipeUseCase(private val llmFactory: LLMFactory) : RecipeUseCase 
             val ingredients = availableProducts.split(",").map { it.trim() }.filter { it.isNotEmpty() }
 
             // Get recipe text using the existing getRecipe method
-            val recipeText = getRecipe(photo, ingredients, recipeTitle).first { it != "Loading..." && !it.contains("Downloading model") }
+            val recipeText = getRecipe(photo, ingredients, recipeTitle).first { 
+                it != "Loading..." && !it.contains("Model not available") 
+            }
 
             // Parse the recipe text into an Output object
             val output = recipeText.toOutput()
@@ -40,10 +42,10 @@ class GetLocalRecipeUseCase(private val llmFactory: LLMFactory) : RecipeUseCase 
     fun getRecipe(photo: ByteArray, ingredients: List<String>, recipeTitle: String? = null): Flow<String> = flow {
         emit("Loading...")
 
-        // Check if model is available, download if needed
+        // Check if model is available
         if (!llmProcessor.isModelAvailable()) {
-            emit("Downloading model...")
-            llmProcessor.downloadModelIfNeeded()
+            emit("Model not available. Please ensure the model is installed.")
+            return@flow
         }
 
         val ingredientsText = ingredients.joinToString(", ")
