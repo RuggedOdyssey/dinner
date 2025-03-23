@@ -168,25 +168,47 @@ private fun InputScreen(
                 )
             }
 
-            PeekabooCamera(
-                state = state,
-                modifier = Modifier.fillMaxSize(),
-                permissionDeniedContent = {
-                    Text("Permission denied")
-                },
-            )
+            // Only show camera preview when cloud model is selected
+            if (modelType == ModelType.CLOUD) {
+                PeekabooCamera(
+                    state = state,
+                    modifier = Modifier.fillMaxSize(),
+                    permissionDeniedContent = {
+                        Text("Permission denied")
+                    },
+                )
+            }
         }
 
-        // Floating Action Button at the bottom center
-        FloatingActionButton(
-            onClick = { state.capture() },
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(
-                    bottom = WindowInsets.systemBars.asPaddingValues().calculateBottomPadding() + 16.dp
-                )
-        ) {
-            CameraIcon()
+        // Floating Action Button at the bottom center - only show in cloud mode
+        if (modelType == ModelType.CLOUD) {
+            FloatingActionButton(
+                onClick = { state.capture() },
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(
+                        bottom = WindowInsets.systemBars.asPaddingValues().calculateBottomPadding() + 16.dp
+                    )
+            ) {
+                CameraIcon()
+            }
+        }
+
+        // Submit button for mock and on-device modes
+        if (modelType != ModelType.CLOUD) {
+            Button(
+                onClick = { 
+                    // Call getRecipe with empty photo data
+                    getRecipe(ByteArray(0), input, if (modelType == ModelType.ON_DEVICE) recipeTitle else null)
+                },
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(
+                        bottom = WindowInsets.systemBars.asPaddingValues().calculateBottomPadding() + 16.dp
+                    )
+            ) {
+                Text("Submit")
+            }
         }
     }
 }
