@@ -178,6 +178,19 @@ private fun InputScreen(
                     },
                 )
             }
+
+            // Submit button for mock and on-device modes
+            if (modelType != ModelType.CLOUD) {
+                Button(
+                    onClick = { 
+                        // Call getRecipe with empty photo data
+                        getRecipe(ByteArray(0), input, if (modelType == ModelType.ON_DEVICE) recipeTitle else null)
+                    },
+                    modifier = Modifier.padding(top = 16.dp)
+                ) {
+                    Text("Submit")
+                }
+            }
         }
 
         // Floating Action Button at the bottom center - only show in cloud mode
@@ -194,22 +207,6 @@ private fun InputScreen(
             }
         }
 
-        // Submit button for mock and on-device modes
-        if (modelType != ModelType.CLOUD) {
-            Button(
-                onClick = { 
-                    // Call getRecipe with empty photo data
-                    getRecipe(ByteArray(0), input, if (modelType == ModelType.ON_DEVICE) recipeTitle else null)
-                },
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(
-                        bottom = WindowInsets.systemBars.asPaddingValues().calculateBottomPadding() + 16.dp
-                    )
-            ) {
-                Text("Submit")
-            }
-        }
     }
 }
 

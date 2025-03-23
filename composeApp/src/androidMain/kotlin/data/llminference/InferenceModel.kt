@@ -7,7 +7,7 @@ import com.google.mediapipe.tasks.genai.llminference.LlmInference
 import com.google.mediapipe.tasks.genai.llminference.LlmInferenceSession
 import com.google.mediapipe.tasks.genai.llminference.LlmInferenceSession.LlmInferenceSessionOptions
 import com.google.mediapipe.tasks.genai.llminference.ProgressListener
-import kotlinx.coroutines.CancellationException
+//import com.google.mediapipe.framework.image.MPImage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
@@ -164,8 +164,11 @@ class InferenceModel(private val context: Context) : LLMProcessor, Closeable {
                 // Note: This implementation currently doesn't use the photo parameter
                 // Future implementations could incorporate the photo into the prompt or use multimodal models
 
+                resetSession()
                 // Add query to the session
                 llmInferenceSession.addQueryChunk(prompt)
+               // val mpImage = MPImage.createFromByteArray(photo)
+               // llmInferenceSession.addImage(mpImage)
 
                 // StringBuilder to accumulate partial results
                 val resultBuilder = StringBuilder()
