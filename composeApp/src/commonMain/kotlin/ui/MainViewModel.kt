@@ -22,6 +22,16 @@ enum class ModelType {
     CLOUD // Online mode with cloud model
 }
 
+enum class DietaryPreference {
+    VEGETARIAN,
+    LACTOSE_FREE,
+    VEGAN,
+    GLUTEN_FREE,
+    NO_SEAFOOD,
+    NO_PEANUTS,
+    NO_PORK
+}
+
 expect fun createLLMFactory(): LLMFactory
 
 class MainViewModel : ViewModel() {
@@ -29,6 +39,32 @@ class MainViewModel : ViewModel() {
     val state = MutableStateFlow<MainViewState>(MainViewState.Input)
     private val _modelType = MutableStateFlow(ModelType.MOCK) // Default to mock mode
     val modelType: StateFlow<ModelType> = _modelType
+
+    // Dietary preference flags
+    private val _vegetarian = MutableStateFlow(false)
+    val vegetarian: StateFlow<Boolean> = _vegetarian
+
+    private val _lactoseFree = MutableStateFlow(false)
+    val lactoseFree: StateFlow<Boolean> = _lactoseFree
+
+    private val _vegan = MutableStateFlow(false)
+    val vegan: StateFlow<Boolean> = _vegan
+
+    private val _glutenFree = MutableStateFlow(false)
+    val glutenFree: StateFlow<Boolean> = _glutenFree
+
+    private val _noSeafood = MutableStateFlow(false)
+    val noSeafood: StateFlow<Boolean> = _noSeafood
+
+    private val _noPeanuts = MutableStateFlow(false)
+    val noPeanuts: StateFlow<Boolean> = _noPeanuts
+
+    private val _noPork = MutableStateFlow(false)
+    val noPork: StateFlow<Boolean> = _noPork
+
+    // Show settings flag
+    private val _showSettings = MutableStateFlow(false)
+    val showSettings: StateFlow<Boolean> = _showSettings
 
     private val getGeminiRecipe = GetGeminiRecipeUseCase()
     private val getMockGeminiRecipe = GetMockGeminiRecipeUseCase()
@@ -124,6 +160,38 @@ class MainViewModel : ViewModel() {
 
     fun setModelType(type: ModelType) {
         _modelType.value = type
+    }
+
+    fun toggleSettings() {
+        _showSettings.value = !_showSettings.value
+    }
+
+    fun setVegetarian(value: Boolean) {
+        _vegetarian.value = value
+    }
+
+    fun setLactoseFree(value: Boolean) {
+        _lactoseFree.value = value
+    }
+
+    fun setVegan(value: Boolean) {
+        _vegan.value = value
+    }
+
+    fun setGlutenFree(value: Boolean) {
+        _glutenFree.value = value
+    }
+
+    fun setNoSeafood(value: Boolean) {
+        _noSeafood.value = value
+    }
+
+    fun setNoPeanuts(value: Boolean) {
+        _noPeanuts.value = value
+    }
+
+    fun setNoPork(value: Boolean) {
+        _noPork.value = value
     }
 
     sealed interface MainViewState {

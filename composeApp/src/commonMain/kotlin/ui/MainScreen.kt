@@ -27,6 +27,7 @@ import androidx.compose.material.TextField
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
@@ -43,6 +44,7 @@ import com.preat.peekaboo.ui.camera.rememberPeekabooCameraState
 import data.dto.Output
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import ui.CameraIcon
+import ui.SettingsScreen
 
 @Composable
 @Preview
@@ -52,7 +54,8 @@ fun MainScreen() {
     MaterialTheme {
         val viewState by viewModel.state.collectAsState()
         val modelType by viewModel.modelType.collectAsState()
-        val showBack by remember { derivedStateOf { viewState !is MainViewModel.MainViewState.Input } }
+        val showSettings by viewModel.showSettings.collectAsState()
+        val showBack by remember { derivedStateOf { viewState !is MainViewModel.MainViewState.Input || showSettings } }
         val screenTitle = "What's for dinner?"
 
         // Use WindowInsets.safeDrawing for edge-to-edge display
@@ -63,12 +66,26 @@ fun MainScreen() {
                     title = { Text(screenTitle) },
                     navigationIcon = {
                         if (showBack) {
-                            IconButton(onClick = viewModel::back) {
+                            IconButton(onClick = { 
+                                if (showSettings) {
+                                    viewModel.toggleSettings()
+                                } else {
+                                    viewModel.back()
+                                }
+                            }) {
                                 Icon(
                                     Icons.AutoMirrored.Filled.ArrowBack,
                                     contentDescription = "Back"
                                 )
                             }
+                        }
+                    },
+                    actions = {
+                        IconButton(onClick = viewModel::toggleSettings) {
+                            Icon(
+                                Icons.Filled.Settings,
+                                contentDescription = "Settings"
+                            )
                         }
                     },
                     // Apply top insets to the TopAppBar and make it taller
@@ -80,36 +97,43 @@ fun MainScreen() {
             contentColor = MaterialTheme.colors.onBackground
 
         ) { innerPadding ->
-            when (viewState) {
-                is MainViewModel.MainViewState.Input -> {
-                    InputScreen(
-                        modifier = Modifier.padding(innerPadding),
-                        getRecipe = { image, input, recipeTitle -> 
-                            viewModel.getRecipe(image, input, recipeTitle)
-                        },
-                        modelType = modelType,
-                        setModelType = viewModel::setModelType
-                    )
-                }
+            if (showSettings) {
+                SettingsScreen(
+                    viewModel = viewModel,
+                    modifier = Modifier.padding(innerPadding)
+                )
+            } else {
+                when (viewState) {
+                    is MainViewModel.MainViewState.Input -> {
+                        InputScreen(
+                            modifier = Modifier.padding(innerPadding),
+                            getRecipe = { image, input, recipeTitle -> 
+                                viewModel.getRecipe(image, input, recipeTitle)
+                            },
+                            modelType = modelType,
+                            setModelType = viewModel::setModelType
+                        )
+                    }
 
-                is MainViewModel.MainViewState.Loading -> {
-                    ProgressScreen(
-                        modifier = Modifier.padding(innerPadding),
-                    )
-                }
+                    is MainViewModel.MainViewState.Loading -> {
+                        ProgressScreen(
+                            modifier = Modifier.padding(innerPadding),
+                        )
+                    }
 
-                is MainViewModel.MainViewState.Success -> {
-                    val output = (viewState as MainViewModel.MainViewState.Success).result
-                    RecipeScreen(
-                        modifier = Modifier.padding(innerPadding), output = output
-                    )
-                }
+                    is MainViewModel.MainViewState.Success -> {
+                        val output = (viewState as MainViewModel.MainViewState.Success).result
+                        RecipeScreen(
+                            modifier = Modifier.padding(innerPadding), output = output
+                        )
+                    }
 
-                is MainViewModel.MainViewState.Error -> {
-                    ErrorScreen(
-                        modifier = Modifier.padding(innerPadding),
-                        viewState = viewState as MainViewModel.MainViewState.Error
-                    )
+                    is MainViewModel.MainViewState.Error -> {
+                        ErrorScreen(
+                            modifier = Modifier.padding(innerPadding),
+                            viewState = viewState as MainViewModel.MainViewState.Error
+                        )
+                    }
                 }
             }
         }
