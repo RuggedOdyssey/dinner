@@ -6,6 +6,8 @@ import androidx.lifecycle.viewModelScope
 import data.dto.Output
 import data.dto.Recipe
 import data.llminference.LLMFactory
+import data.preferences.PreferenceKeys
+import data.preferences.PreferencesRepository
 import domain.GetGeminiRecipeUseCase
 import domain.GetLocalRecipeUseCase
 import domain.GetMockGeminiRecipeUseCase
@@ -40,6 +42,9 @@ class MainViewModel : ViewModel() {
     private val _modelType = MutableStateFlow(ModelType.MOCK) // Default to mock mode
     val modelType: StateFlow<ModelType> = _modelType
 
+    // Preferences repository for storing dietary preferences
+    private val preferencesRepository = PreferencesRepository()
+
     // Dietary preference flags
     private val _vegetarian = MutableStateFlow(false)
     val vegetarian: StateFlow<Boolean> = _vegetarian
@@ -69,6 +74,17 @@ class MainViewModel : ViewModel() {
     private val getGeminiRecipe = GetGeminiRecipeUseCase()
     private val getMockGeminiRecipe = GetMockGeminiRecipeUseCase()
     private val getLocalRecipe = GetLocalRecipeUseCase(createLLMFactory())
+
+    init {
+        // Load dietary preferences from storage
+        _vegetarian.value = preferencesRepository.getBoolean(PreferenceKeys.VEGETARIAN)
+        _lactoseFree.value = preferencesRepository.getBoolean(PreferenceKeys.LACTOSE_FREE)
+        _vegan.value = preferencesRepository.getBoolean(PreferenceKeys.VEGAN)
+        _glutenFree.value = preferencesRepository.getBoolean(PreferenceKeys.GLUTEN_FREE)
+        _noSeafood.value = preferencesRepository.getBoolean(PreferenceKeys.NO_SEAFOOD)
+        _noPeanuts.value = preferencesRepository.getBoolean(PreferenceKeys.NO_PEANUTS)
+        _noPork.value = preferencesRepository.getBoolean(PreferenceKeys.NO_PORK)
+    }
 
     fun getRecipe(image: ByteArray, input: MutableState<String>, recipeTitle: MutableState<String>? = null) = viewModelScope.launch(Dispatchers.IO) {
         state.value = MainViewState.Loading
@@ -168,30 +184,37 @@ class MainViewModel : ViewModel() {
 
     fun setVegetarian(value: Boolean) {
         _vegetarian.value = value
+        preferencesRepository.saveBoolean(PreferenceKeys.VEGETARIAN, value)
     }
 
     fun setLactoseFree(value: Boolean) {
         _lactoseFree.value = value
+        preferencesRepository.saveBoolean(PreferenceKeys.LACTOSE_FREE, value)
     }
 
     fun setVegan(value: Boolean) {
         _vegan.value = value
+        preferencesRepository.saveBoolean(PreferenceKeys.VEGAN, value)
     }
 
     fun setGlutenFree(value: Boolean) {
         _glutenFree.value = value
+        preferencesRepository.saveBoolean(PreferenceKeys.GLUTEN_FREE, value)
     }
 
     fun setNoSeafood(value: Boolean) {
         _noSeafood.value = value
+        preferencesRepository.saveBoolean(PreferenceKeys.NO_SEAFOOD, value)
     }
 
     fun setNoPeanuts(value: Boolean) {
         _noPeanuts.value = value
+        preferencesRepository.saveBoolean(PreferenceKeys.NO_PEANUTS, value)
     }
 
     fun setNoPork(value: Boolean) {
         _noPork.value = value
+        preferencesRepository.saveBoolean(PreferenceKeys.NO_PORK, value)
     }
 
     sealed interface MainViewState {
