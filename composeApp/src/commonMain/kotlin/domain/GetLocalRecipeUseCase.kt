@@ -17,13 +17,18 @@ class GetLocalRecipeUseCase(private val llmFactory: LLMFactory) : RecipeUseCase 
      * Implementation of the RecipeUseCase interface.
      * Processes the photo and available products to generate a recipe.
      */
-    override suspend operator fun invoke(photo: ByteArray, availableProducts: String, recipeTitle: String?): Result<Output> {
+    override suspend operator fun invoke(
+        photo: ByteArray, 
+        availableProducts: String, 
+        recipeTitle: String?,
+        dietaryPreferences: DietaryPreferences
+    ): Result<Output> {
         return try {
             // Parse ingredients from availableProducts
             val ingredients = availableProducts.split(",").map { it.trim() }.filter { it.isNotEmpty() }
 
             // Get recipe text using the existing getRecipe method
-            val recipeText = getRecipe(photo, ingredients, recipeTitle).first { 
+            val recipeText = getRecipe(photo, ingredients, recipeTitle, dietaryPreferences).first { 
                 it != "Loading..." && !it.contains("Model not available") 
             }
 
@@ -39,7 +44,12 @@ class GetLocalRecipeUseCase(private val llmFactory: LLMFactory) : RecipeUseCase 
      * Original method for getting a recipe based on ingredients.
      * Returns a flow of strings representing the recipe generation progress and result.
      */
-    fun getRecipe(photo: ByteArray, ingredients: List<String>, recipeTitle: String? = null): Flow<String> = flow {
+    fun getRecipe(
+        photo: ByteArray, 
+        ingredients: List<String>, 
+        recipeTitle: String? = null,
+        dietaryPreferences: DietaryPreferences = DietaryPreferences()
+    ): Flow<String> = flow {
         emit("Loading...")
 
         // Check if model is available
@@ -49,7 +59,7 @@ class GetLocalRecipeUseCase(private val llmFactory: LLMFactory) : RecipeUseCase 
         }
 
         val ingredientsText = ingredients.joinToString(", ")
-        val prompt = RecipePrompt.makePrompt(ingredientsText, recipeTitle)
+        val prompt = RecipePrompt.makePrompt(ingredientsText, recipeTitle, dietaryPreferences)
 
         val response = llmProcessor.generateText(photo, prompt)
         emit(response)

@@ -9,12 +9,12 @@ object RecipePrompt {
         "\nThen provide grocery list of the additional ingredients with there quantities in metric, which is needed for the recipe. exclude the ingredients I listed already."
     const val FORMAT_REQUEST = "\nformat the response in a valid JSON object with all brackets matching in the following format\n Do not output markdown\n"
 
-    fun makePrompt(availableProducts: String, recipeTitle: String? = null): String {
+    fun makePrompt(availableProducts: String, recipeTitle: String? = null, dietaryPreferences: DietaryPreferences = DietaryPreferences()): String {
         val titleInstruction = if (!recipeTitle.isNullOrBlank()) {
             "\nThe recipe title should be: $recipeTitle"
         } else {
             ""
         }
-        return PROMPT_WRAPPER_PREFIX + availableProducts + titleInstruction + PROMPT_WRAPPER_SUFFIX + FORMAT_REQUEST + outputFormat
+        return PROMPT_WRAPPER_PREFIX + availableProducts + titleInstruction + "\n" + dietaryPreferences.toString() + PROMPT_WRAPPER_SUFFIX + FORMAT_REQUEST + outputFormat
     }
 }

@@ -8,6 +8,7 @@ import data.dto.Recipe
 import data.llminference.LLMFactory
 import data.preferences.PreferenceKeys
 import data.preferences.PreferencesRepository
+import domain.DietaryPreferences
 import domain.GetGeminiRecipeUseCase
 import domain.GetLocalRecipeUseCase
 import domain.GetMockGeminiRecipeUseCase
@@ -89,11 +90,14 @@ class MainViewModel : ViewModel() {
     fun getRecipe(image: ByteArray, input: MutableState<String>, recipeTitle: MutableState<String>? = null) = viewModelScope.launch(Dispatchers.IO) {
         state.value = MainViewState.Loading
 
+        // Create dietary preferences object
+        val dietaryPreferences = createDietaryPreferences()
+
         when (_modelType.value) {
             ModelType.ON_DEVICE -> {
                 // Use on-device LLM model
                 val ingredients = input.value.split(",").map { it.trim() }.filter { it.isNotEmpty() }
-                getLocalRecipe.getRecipe(image, ingredients).collectLatest { response ->
+                getLocalRecipe.getRecipe(image, ingredients, recipeTitle?.value, dietaryPreferences).collectLatest { response ->
                     if (response == "Loading..." || response.contains("Downloading model")) {
                         state.value = MainViewState.Loading
                     } else {
@@ -149,7 +153,7 @@ class MainViewModel : ViewModel() {
             }
             ModelType.MOCK -> {
                 // Use mock Gemini service
-                val result = getMockGeminiRecipe(image, input.value, recipeTitle?.value)
+                val result = getMockGeminiRecipe(image, input.value, recipeTitle?.value, dietaryPreferences)
                 if (result.isSuccess) {
                     state.value = MainViewState.Success(result.getOrThrow())
                 } else {
@@ -159,7 +163,7 @@ class MainViewModel : ViewModel() {
             }
             ModelType.CLOUD -> {
                 // Use real Gemini service in online mode
-                val result = getGeminiRecipe(image, input.value, recipeTitle?.value)
+                val result = getGeminiRecipe(image, input.value, recipeTitle?.value, dietaryPreferences)
                 if (result.isSuccess) {
                     state.value = MainViewState.Success(result.getOrThrow())
                 } else {
@@ -215,6 +219,21 @@ class MainViewModel : ViewModel() {
     fun setNoPork(value: Boolean) {
         _noPork.value = value
         preferencesRepository.saveBoolean(PreferenceKeys.NO_PORK, value)
+    }
+
+    /**
+     * Creates a DietaryPreferences object from the current preference values.
+     */
+    private fun createDietaryPreferences(): DietaryPreferences {
+        return DietaryPreferences(
+            vegetarian = _vegetarian.value,
+            lactoseFree = _lactoseFree.value,
+            vegan = _vegan.value,
+            glutenFree = _glutenFree.value,
+            noSeafood = _noSeafood.value,
+            noPeanuts = _noPeanuts.value,
+            noPork = _noPork.value
+        )
     }
 
     sealed interface MainViewState {
