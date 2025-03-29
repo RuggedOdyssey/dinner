@@ -81,11 +81,14 @@ fun MainScreen() {
                         }
                     },
                     actions = {
-                        IconButton(onClick = viewModel::toggleSettings) {
-                            Icon(
-                                Icons.Filled.Settings,
-                                contentDescription = "Settings"
-                            )
+                        // Hide settings icon when recipe card and groceries are shown
+                        if (viewState !is MainViewModel.MainViewState.Success) {
+                            IconButton(onClick = viewModel::toggleSettings) {
+                                Icon(
+                                    Icons.Filled.Settings,
+                                    contentDescription = "Settings"
+                                )
+                            }
                         }
                     },
                     // Apply top insets to the TopAppBar and make it taller
@@ -244,7 +247,7 @@ private fun ProgressScreen(modifier: Modifier = Modifier) {
 @Composable
 private fun RecipeScreen(modifier: Modifier = Modifier, output: Output) {
     var selectedTabIndex by remember { mutableStateOf(0) }
-    val tabs = listOf("Groceries", "Recipe")
+    val tabs = listOf("Recipe", "Groceries")
     Column(modifier = modifier) {
         TabRow(selectedTabIndex = selectedTabIndex) {
             tabs.forEachIndexed { index, title ->
@@ -256,8 +259,8 @@ private fun RecipeScreen(modifier: Modifier = Modifier, output: Output) {
             }
         }
         when (selectedTabIndex) {
-            0 -> GroceriesCard(groceries = output.groceries)
-            1 -> RecipeCard(recipe = output.recipe)
+            0 -> RecipeCard(recipe = output.recipe)
+            1 -> GroceriesCard(groceries = output.groceries)
         }
     }
 }
