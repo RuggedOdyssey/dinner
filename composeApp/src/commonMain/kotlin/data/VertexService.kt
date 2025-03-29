@@ -85,6 +85,6 @@ class VertexService {
         const val API_ENDPOINT = "us-central1-aiplatform.googleapis.com"
         const val PROJECT_ID = "whats-for-dinner-416112"
         const val LOCATION_ID = "europe-west3"
-        const val MODEL_ID = "gemini-1.5-flash-001"
+        const val MODEL_ID = "gemini-2.0-flash-001"
     }
 }

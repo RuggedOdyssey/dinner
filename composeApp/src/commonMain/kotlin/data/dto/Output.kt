@@ -29,3 +29,4 @@ output: {
 """
 
 fun String.toOutput() = Json { ignoreUnknownKeys = true }.decodeFromString<Output>(this)
+
