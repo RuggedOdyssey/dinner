@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import data.dto.Recipe
+import data.dto.Ingredient
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
@@ -27,8 +28,11 @@ fun RecipeCard(modifier: Modifier = Modifier, recipe:Recipe) {
                 modifier = Modifier.padding(bottom = 16.dp)
             )
         }
-        items(recipe.ingredients) { item ->
-            Text(text = item, modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp))
+        items(recipe.ingredients) { ingredient ->
+            Text(
+                text = "${ingredient.quantity} ${ingredient.name}",
+                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+            )
         }
         item {
             Text(
@@ -50,13 +54,13 @@ fun RecipeCardPreview() {
         title = "Pancakes",
         description = "Fluffy and delicious pancakes that are perfect for breakfast or brunch.",
         ingredients = listOf(
-            "250g flour",
-            "2 eggs",
-            "1 cup milk",
-            "2 tbsp sugar",
-            "1 tsp baking powder",
-            "1/2 tsp salt",
-            "2 tbsp melted butter"
+            Ingredient(name = "flour", quantity = "250g"),
+            Ingredient(name = "eggs", quantity = "2"),
+            Ingredient(name = "milk", quantity = "1 cup"),
+            Ingredient(name = "sugar", quantity = "2 tbsp"),
+            Ingredient(name = "baking powder", quantity = "1 tsp"),
+            Ingredient(name = "salt", quantity = "1/2 tsp"),
+            Ingredient(name = "melted butter", quantity = "2 tbsp")
         ),
         steps = listOf(
             "1. In a large bowl, mix flour, sugar, baking powder, and salt.",

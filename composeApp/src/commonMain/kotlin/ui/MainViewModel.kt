@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import data.dto.Output
 import data.dto.Recipe
+import data.dto.Ingredient
 import data.llminference.LLMFactory
 import data.preferences.PreferenceKeys
 import data.preferences.PreferencesRepository
@@ -106,7 +107,7 @@ class MainViewModel : ViewModel() {
                         val lines = response.split("\n")
                         val title = recipeTitle?.value?.takeIf { it.isNotBlank() } ?: lines.firstOrNull() ?: "Recipe"
 
-                        val ingredientsList = mutableListOf<String>()
+                        val ingredientsList = mutableListOf<Ingredient>()
                         val steps = mutableListOf<String>()
 
                         var inIngredients = false
@@ -124,7 +125,14 @@ class MainViewModel : ViewModel() {
                                     inSteps = true
                                 }
                                 inIngredients && line.isNotBlank() && !line.contains("Ingredients", ignoreCase = true) -> {
-                                    ingredientsList.add(line.trim())
+                                    val trimmedLine = line.trim()
+                                    // Try to split the ingredient line into quantity and name
+                                    val parts = trimmedLine.split(" ", limit = 2)
+                                    if (parts.size > 1) {
+                                        ingredientsList.add(Ingredient(name = parts[1], quantity = parts[0]))
+                                    } else {
+                                        ingredientsList.add(Ingredient(name = trimmedLine, quantity = ""))
+                                    }
                                 }
                                 inSteps && line.isNotBlank() && 
                                     !line.contains("Instructions", ignoreCase = true) && 
