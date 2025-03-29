@@ -4,8 +4,6 @@ import androidx.compose.runtime.MutableState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import data.dto.Output
-import data.dto.Recipe
-import data.dto.Ingredient
 import data.llminference.LLMFactory
 import data.preferences.PreferenceKeys
 import data.preferences.PreferencesRepository
@@ -16,22 +14,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 enum class ModelType {
     ON_DEVICE, // On-device model
     CLOUD // Online mode with cloud model
-}
-
-enum class DietaryPreference {
-    VEGETARIAN,
-    LACTOSE_FREE,
-    VEGAN,
-    GLUTEN_FREE,
-    NO_SEAFOOD,
-    NO_PEANUTS,
-    NO_PORK
 }
 
 expect fun createLLMFactory(): LLMFactory
@@ -94,66 +81,12 @@ class MainViewModel : ViewModel() {
         when (_modelType.value) {
             ModelType.ON_DEVICE -> {
                 // Use on-device LLM model
-                val ingredients = input.value.split(",").map { it.trim() }.filter { it.isNotEmpty() }
-                getLocalRecipe.getRecipe(image, ingredients, recipeTitle?.value, dietaryPreferences).collectLatest { response ->
-                    if (response == "Loading..." || response.contains("Downloading model")) {
-                        state.value = MainViewState.Loading
-                    } else {
-                        // Parse the LLM output into our data structure
-                        // This is a simplified parser - in a real app you'd want more robust parsing
-                        val lines = response.split("\n")
-                        val title = recipeTitle?.value?.takeIf { it.isNotBlank() } ?: lines.firstOrNull() ?: "Recipe"
-
-                        val ingredientsList = mutableListOf<Ingredient>()
-                        val steps = mutableListOf<String>()
-
-                        var inIngredients = false
-                        var inSteps = false
-
-                        lines.forEach { line ->
-                            when {
-                                line.contains("Ingredients", ignoreCase = true) && !inIngredients && !inSteps -> {
-                                    inIngredients = true
-                                }
-                                line.contains("Instructions", ignoreCase = true) || 
-                                     line.contains("Directions", ignoreCase = true) || 
-                                     line.contains("Steps", ignoreCase = true) -> {
-                                    inIngredients = false
-                                    inSteps = true
-                                }
-                                inIngredients && line.isNotBlank() && !line.contains("Ingredients", ignoreCase = true) -> {
-                                    val trimmedLine = line.trim()
-                                    // Try to split the ingredient line into quantity and name
-                                    val parts = trimmedLine.split(" ", limit = 2)
-                                    if (parts.size > 1) {
-                                        ingredientsList.add(Ingredient(name = parts[1], quantity = parts[0]))
-                                    } else {
-                                        ingredientsList.add(Ingredient(name = trimmedLine, quantity = ""))
-                                    }
-                                }
-                                inSteps && line.isNotBlank() && 
-                                    !line.contains("Instructions", ignoreCase = true) && 
-                                    !line.contains("Directions", ignoreCase = true) && 
-                                    !line.contains("Steps", ignoreCase = true) -> {
-                                    steps.add(line.trim())
-                                }
-                            }
-                        }
-
-                        val recipe = Recipe(
-                            title = title,
-                            description = "Generated with on-device LLM",
-                            ingredients = ingredientsList,
-                            steps = steps
-                        )
-
-                        val output = Output(
-                            groceries = ingredients.map { Ingredient(name = it, quantity = "") },
-                            recipe = recipe
-                        )
-
-                        state.value = MainViewState.Success(output)
-                    }
+                val result = getLocalRecipe(image, input.value, recipeTitle?.value, dietaryPreferences)
+                if (result.isSuccess) {
+                    state.value = MainViewState.Success(result.getOrThrow())
+                } else {
+                    result.exceptionOrNull()?.printStackTrace()
+                    state.value = MainViewState.Error(result.exceptionOrNull()?.message ?: "An error occurred")
                 }
             }
             ModelType.CLOUD -> {
