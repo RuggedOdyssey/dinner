@@ -12,7 +12,6 @@ import data.preferences.PreferencesRepository
 import domain.DietaryPreferences
 import domain.GetGeminiRecipeUseCase
 import domain.GetLocalRecipeUseCase
-import domain.GetMockGeminiRecipeUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,7 +20,6 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 enum class ModelType {
-    MOCK, // Offline mode with mock data
     ON_DEVICE, // On-device model
     CLOUD // Online mode with cloud model
 }
@@ -41,7 +39,7 @@ expect fun createLLMFactory(): LLMFactory
 class MainViewModel : ViewModel() {
 
     val state = MutableStateFlow<MainViewState>(MainViewState.Input)
-    private val _modelType = MutableStateFlow(ModelType.MOCK) // Default to mock mode
+    private val _modelType = MutableStateFlow(ModelType.ON_DEVICE) // Default to on-device mode
     val modelType: StateFlow<ModelType> = _modelType
 
     // Preferences repository for storing dietary preferences
@@ -74,7 +72,6 @@ class MainViewModel : ViewModel() {
     val showSettings: StateFlow<Boolean> = _showSettings
 
     private val getGeminiRecipe = GetGeminiRecipeUseCase()
-    private val getMockGeminiRecipe = GetMockGeminiRecipeUseCase()
     private val getLocalRecipe = GetLocalRecipeUseCase(createLLMFactory())
 
     init {
@@ -157,16 +154,6 @@ class MainViewModel : ViewModel() {
 
                         state.value = MainViewState.Success(output)
                     }
-                }
-            }
-            ModelType.MOCK -> {
-                // Use mock Gemini service
-                val result = getMockGeminiRecipe(image, input.value, recipeTitle?.value, dietaryPreferences)
-                if (result.isSuccess) {
-                    state.value = MainViewState.Success(result.getOrThrow())
-                } else {
-                    result.exceptionOrNull()?.printStackTrace()
-                    state.value = MainViewState.Error(result.exceptionOrNull()?.message ?: "An error occurred")
                 }
             }
             ModelType.CLOUD -> {

@@ -157,9 +157,9 @@ private fun InputScreen(
 
     Box(modifier.fillMaxSize()) {
         Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-            // Threeway tab for model selection
-            val modelTypes = listOf(ModelType.MOCK, ModelType.ON_DEVICE, ModelType.CLOUD)
-            val modelTypeLabels = listOf("Mock", "On-device", "Cloud")
+            // Two-way tab for model selection
+            val modelTypes = listOf(ModelType.ON_DEVICE, ModelType.CLOUD)
+            val modelTypeLabels = listOf("On-device", "Cloud")
             val selectedTabIndex = modelTypes.indexOf(modelType)
 
             TabRow(
@@ -203,8 +203,8 @@ private fun InputScreen(
                 )
             }
 
-            // Submit button for mock and on-device modes
-            if (modelType != ModelType.CLOUD) {
+            // Submit button for on-device mode
+            if (modelType == ModelType.ON_DEVICE) {
                 Button(
                     onClick = { 
                         // Call getRecipe with empty photo data
