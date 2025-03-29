@@ -1,26 +1,45 @@
 package ui
 
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import data.dto.Recipe
 import data.dto.Ingredient
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import util.rememberPlatformClipboardUtil
 
 @Composable
 fun RecipeCard(modifier: Modifier = Modifier, recipe:Recipe) {
+    val clipboardUtil = rememberPlatformClipboardUtil()
+
     LazyColumn(modifier = modifier.padding(16.dp)) {
         item {
-            Text(
-                text = recipe.title,
-                style = MaterialTheme.typography.h4,
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.padding(bottom = 12.dp)
-            )
+            ) {
+                Text(
+                    text = recipe.title,
+                    style = MaterialTheme.typography.h4,
+                    modifier = Modifier.weight(1f)
+                )
+                TextButton(
+                    onClick = { clipboardUtil.copyToClipboard(recipe.title) },
+                    modifier = Modifier.padding(start = 8.dp)
+                ) {
+                    Text("Copy")
+                }
+            }
         }
         item {
             Text(
