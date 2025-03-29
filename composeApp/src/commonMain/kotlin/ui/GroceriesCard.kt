@@ -10,27 +10,22 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import data.dto.Ingredient
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
-fun GroceriesCard(modifier: Modifier = Modifier, groceries: List<String>) {
+fun GroceriesCard(modifier: Modifier = Modifier, groceries: List<Ingredient>) {
     LazyColumn(modifier = modifier) {
-        items(groceries) { item ->
-            // Split the item into amount and name
-            // Assuming format is like "250g flour", "2 eggs", etc.
-            val parts = item.split(" ", limit = 2)
-            val amount = if (parts.size > 1) parts[0] else ""
-            val itemName = if (parts.size > 1) parts[1] else item
-
+        items(groceries) { ingredient ->
             Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)) {
-                // Amount column (takes 30% of the width)
+                // Quantity column (takes 30% of the width)
                 Text(
-                    text = amount,
+                    text = ingredient.quantity,
                     modifier = Modifier.weight(0.3f)
                 )
-                // Item name column (takes 70% of the width)
+                // Name column (takes 70% of the width)
                 Text(
-                    text = itemName,
+                    text = ingredient.name,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.weight(0.7f)
                 )
@@ -43,16 +38,16 @@ fun GroceriesCard(modifier: Modifier = Modifier, groceries: List<String>) {
 @Preview
 fun GroceriesCardPreview() {
     val sampleGroceries = listOf(
-        "250g flour",
-        "2 eggs",
-        "1 cup milk",
-        "100g butter",
-        "1 tsp salt",
-        "2 tbsp sugar",
-        "500g chicken",
-        "3 tomatoes",
-        "1 onion",
-        "2 cloves garlic"
+        Ingredient(name = "flour", quantity = "250g"),
+        Ingredient(name = "eggs", quantity = "2"),
+        Ingredient(name = "milk", quantity = "1 cup"),
+        Ingredient(name = "butter", quantity = "100g"),
+        Ingredient(name = "salt", quantity = "1 tsp"),
+        Ingredient(name = "sugar", quantity = "2 tbsp"),
+        Ingredient(name = "chicken", quantity = "500g"),
+        Ingredient(name = "tomatoes", quantity = "3"),
+        Ingredient(name = "onion", quantity = "1"),
+        Ingredient(name = "garlic", quantity = "2 cloves")
     )
     GroceriesCard(groceries = sampleGroceries)
 }

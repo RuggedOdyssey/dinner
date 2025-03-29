@@ -4,7 +4,7 @@ import kotlinx.serialization.json.Json
 
 @Serializable
 data class Output(
-    val groceries: List<String> = emptyList(),
+    val groceries: List<Ingredient> = emptyList(),
     val recipe: Recipe = Recipe()
 )
 
@@ -21,20 +21,5 @@ data class Recipe(
     val steps: List<String> = emptyList(),
     val title: String = ""
 )
-
-const val outputFormat = """
-output: {
-    groceries: :string[],
-    recipe {
-        title: string,
-        description: string,
-        ingredients: {
-            name: string,
-            quantity: string
-        }[],
-        steps: string[]
-    }
-}
-"""
 
 fun String.toOutput() = Json { ignoreUnknownKeys = true }.decodeFromString<Output>(this)

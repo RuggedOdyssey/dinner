@@ -27,7 +27,13 @@ class GetMockGeminiRecipeUseCase : RecipeUseCase {
         }
 
         return Output(
-            groceries = listOf("250g flour", "2 eggs", "500ml milk", "1 tsp salt", "2 tbsp olive oil"),
+            groceries = listOf(
+                Ingredient(name = "flour", quantity = "250g"),
+                Ingredient(name = "eggs", quantity = "2"),
+                Ingredient(name = "milk", quantity = "500ml"),
+                Ingredient(name = "salt", quantity = "1 tsp"),
+                Ingredient(name = "olive oil", quantity = "2 tbsp")
+            ),
             recipe = Recipe(
                 title = recipeTitle ?: "Mock Recipe with ${ingredients.joinToString(", ")}",
                 description = "This is a mock recipe generated in offline mode.$dietaryNote",

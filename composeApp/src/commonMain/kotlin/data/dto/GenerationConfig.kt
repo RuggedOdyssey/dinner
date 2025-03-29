@@ -24,7 +24,19 @@ private fun buildOutputSchema(): JsonObject = buildJsonObject {
         putJsonObject("groceries") {
             put("type", "array")
             putJsonObject("items") {
-                put("type", "string")
+                put("type", "object")
+                putJsonObject("properties") {
+                    putJsonObject("name") {
+                        put("type", "string")
+                    }
+                    putJsonObject("quantity") {
+                        put("type", "string")
+                    }
+                }
+                putJsonArray("required") {
+                    add(JsonPrimitive("name"))
+                    add(JsonPrimitive("quantity"))
+                }
             }
         }
         putJsonObject("recipe") {

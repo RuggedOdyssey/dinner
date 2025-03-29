@@ -151,7 +151,7 @@ class MainViewModel : ViewModel() {
                         )
 
                         val output = Output(
-                            groceries = ingredients,
+                            groceries = ingredients.map { Ingredient(name = it, quantity = "") },
                             recipe = recipe
                         )
 
