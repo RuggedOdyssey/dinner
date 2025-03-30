@@ -33,6 +33,10 @@ class MainViewModel : ViewModel() {
     private val _pantryIngredient = MutableStateFlow("")
     val pantryIngredient: StateFlow<String> = _pantryIngredient
 
+    // Last recipe state
+    private val _lastRecipe = MutableStateFlow<Recipe?>(null)
+    val lastRecipe: StateFlow<Recipe?> = _lastRecipe
+
     // Preferences repository for storing dietary preferences
     private val preferencesRepository = PreferencesRepository()
 
@@ -54,6 +58,8 @@ class MainViewModel : ViewModel() {
 
     fun getRecipe(image: ByteArray, input: MutableState<String>, recipeTitle: MutableState<String>? = null) = viewModelScope.launch(Dispatchers.IO) {
         state.value = MainViewState.Loading
+        // Clear the last recipe when the usecase is invoked
+        _lastRecipe.value = null
 
         // Select the appropriate use case based on model type
         val useCase: RecipeUseCase = when (_modelType.value) {
@@ -64,7 +70,10 @@ class MainViewModel : ViewModel() {
         // Invoke the selected use case and handle the result
         val result = useCase(image, input.value, recipeTitle?.value, _dietaryPreferences.value)
         if (result.isSuccess) {
-            state.value = MainViewState.Success(result.getOrThrow())
+            val recipe = result.getOrThrow()
+            // Save the last recipe returned by the usecase
+            _lastRecipe.value = recipe
+            state.value = MainViewState.Success(recipe)
         } else {
             result.exceptionOrNull()?.printStackTrace()
             state.value = MainViewState.Error(result.exceptionOrNull()?.message ?: "An error occurred")
@@ -72,6 +81,7 @@ class MainViewModel : ViewModel() {
     }
 
     fun back() {
+        _lastRecipe.value = null
         state.value = MainViewState.Input
     }
 
