@@ -41,6 +41,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.preat.peekaboo.ui.camera.PeekabooCamera
 import com.preat.peekaboo.ui.camera.rememberPeekabooCameraState
+import data.dto.Ingredient
 import data.dto.Recipe
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import ui.CameraIcon
@@ -129,8 +130,11 @@ fun MainScreen() {
 
                     is MainViewModel.MainViewState.Success -> {
                         val recipe = (viewState as MainViewModel.MainViewState.Success).result
+                        val groceries = viewModel.getGroceries(recipe)
                         RecipeScreen(
-                            modifier = Modifier.padding(innerPadding), recipe = recipe
+                            modifier = Modifier.padding(innerPadding), 
+                            recipe = recipe,
+                            groceries = groceries
                         )
                     }
 
@@ -253,7 +257,7 @@ private fun ProgressScreen(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun RecipeScreen(modifier: Modifier = Modifier, recipe: Recipe) {
+private fun RecipeScreen(modifier: Modifier = Modifier, recipe: Recipe, groceries: List<Ingredient>) {
     var selectedTabIndex by remember { mutableStateOf(0) }
     val tabs = listOf("Recipe", "Groceries")
     Column(modifier = modifier) {
@@ -268,7 +272,7 @@ private fun RecipeScreen(modifier: Modifier = Modifier, recipe: Recipe) {
         }
         when (selectedTabIndex) {
             0 -> RecipeCard(recipe = recipe)
-            1 -> GroceriesCard(groceries = recipe.ingredients)
+            1 -> GroceriesCard(groceries = groceries)
         }
     }
 }

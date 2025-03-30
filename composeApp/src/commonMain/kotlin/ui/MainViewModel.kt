@@ -3,6 +3,7 @@ package ui
 import androidx.compose.runtime.MutableState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import data.dto.Ingredient
 import data.dto.Recipe
 import data.llminference.LLMFactory
 import data.preferences.PreferenceKeys
@@ -162,6 +163,16 @@ class MainViewModel : ViewModel() {
 
     fun updatePantryIngredient(value: String) {
         _pantryIngredient.value = value
+    }
+
+    fun getGroceries(recipe: Recipe): List<Ingredient> {
+        val pantryIngredientValue = _pantryIngredient.value
+        if (pantryIngredientValue.isBlank()) {
+            return recipe.ingredients
+        }
+        return recipe.ingredients.filter { ingredient ->
+            !ingredient.name.contains(pantryIngredientValue, ignoreCase = true)
+        }
     }
 
     sealed interface MainViewState {
