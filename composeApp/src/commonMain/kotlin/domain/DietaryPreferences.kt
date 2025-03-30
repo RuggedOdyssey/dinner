@@ -1,8 +1,9 @@
 package domain
 
-/**
- * Data class representing dietary preferences.
- */
+import data.preferences.PreferenceKeys
+import data.preferences.PreferencesRepository
+
+/** Data class representing dietary preferences. */
 data class DietaryPreferences(
     val vegetarian: Boolean = false,
     val lactoseFree: Boolean = false,
@@ -14,7 +15,7 @@ data class DietaryPreferences(
 ) {
     override fun toString(): String {
         val preferences = mutableListOf<String>()
-        
+
         if (vegetarian) preferences.add("vegetarian")
         if (lactoseFree) preferences.add("lactose-free")
         if (vegan) preferences.add("vegan")
@@ -22,11 +23,23 @@ data class DietaryPreferences(
         if (noSeafood) preferences.add("no seafood")
         if (noPeanuts) preferences.add("no peanuts")
         if (noPork) preferences.add("no pork")
-        
+
         return if (preferences.isEmpty()) {
             "no special dietary preferences"
         } else {
             "dietary preferences: ${preferences.joinToString(", ")}"
         }
     }
+
 }
+
+fun DietaryPreferences(preferencesRepository: PreferencesRepository): DietaryPreferences = DietaryPreferences(
+    vegetarian = preferencesRepository.getBoolean(PreferenceKeys.VEGETARIAN, false),
+    lactoseFree = preferencesRepository.getBoolean(PreferenceKeys.LACTOSE_FREE, false),
+    vegan = preferencesRepository.getBoolean(PreferenceKeys.VEGAN, false),
+    glutenFree = preferencesRepository.getBoolean(PreferenceKeys.GLUTEN_FREE, false),
+    noSeafood = preferencesRepository.getBoolean(PreferenceKeys.NO_SEAFOOD, false),
+    noPeanuts = preferencesRepository.getBoolean(PreferenceKeys.NO_PEANUTS, false),
+    noPork = preferencesRepository.getBoolean(PreferenceKeys.NO_PORK, false)
+)
+

@@ -11,7 +11,6 @@ import domain.DietaryPreferences
 import domain.GetGeminiRecipeUseCase
 import domain.GetLocalRecipeUseCase
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -32,27 +31,9 @@ class MainViewModel : ViewModel() {
     // Preferences repository for storing dietary preferences
     private val preferencesRepository = PreferencesRepository()
 
-    // Dietary preference flags
-    private val _vegetarian = MutableStateFlow(false)
-    val vegetarian: StateFlow<Boolean> = _vegetarian
-
-    private val _lactoseFree = MutableStateFlow(false)
-    val lactoseFree: StateFlow<Boolean> = _lactoseFree
-
-    private val _vegan = MutableStateFlow(false)
-    val vegan: StateFlow<Boolean> = _vegan
-
-    private val _glutenFree = MutableStateFlow(false)
-    val glutenFree: StateFlow<Boolean> = _glutenFree
-
-    private val _noSeafood = MutableStateFlow(false)
-    val noSeafood: StateFlow<Boolean> = _noSeafood
-
-    private val _noPeanuts = MutableStateFlow(false)
-    val noPeanuts: StateFlow<Boolean> = _noPeanuts
-
-    private val _noPork = MutableStateFlow(false)
-    val noPork: StateFlow<Boolean> = _noPork
+    // Dietary preferences state
+    private val _dietaryPreferences = MutableStateFlow(DietaryPreferences())
+    val dietaryPreferences: StateFlow<DietaryPreferences> = _dietaryPreferences
 
     // Show settings flag
     private val _showSettings = MutableStateFlow(false)
@@ -62,26 +43,17 @@ class MainViewModel : ViewModel() {
     private val getLocalRecipe = GetLocalRecipeUseCase(createLLMFactory())
 
     init {
-        // Load dietary preferences from storage
-        _vegetarian.value = preferencesRepository.getBoolean(PreferenceKeys.VEGETARIAN)
-        _lactoseFree.value = preferencesRepository.getBoolean(PreferenceKeys.LACTOSE_FREE)
-        _vegan.value = preferencesRepository.getBoolean(PreferenceKeys.VEGAN)
-        _glutenFree.value = preferencesRepository.getBoolean(PreferenceKeys.GLUTEN_FREE)
-        _noSeafood.value = preferencesRepository.getBoolean(PreferenceKeys.NO_SEAFOOD)
-        _noPeanuts.value = preferencesRepository.getBoolean(PreferenceKeys.NO_PEANUTS)
-        _noPork.value = preferencesRepository.getBoolean(PreferenceKeys.NO_PORK)
+        // Update the DietaryPreferences state
+        _dietaryPreferences.value = DietaryPreferences(preferencesRepository)
     }
 
     fun getRecipe(image: ByteArray, input: MutableState<String>, recipeTitle: MutableState<String>? = null) = viewModelScope.launch(Dispatchers.IO) {
         state.value = MainViewState.Loading
 
-        // Create dietary preferences object
-        val dietaryPreferences = createDietaryPreferences()
-
         when (_modelType.value) {
             ModelType.ON_DEVICE -> {
                 // Use on-device LLM model
-                val result = getLocalRecipe(image, input.value, recipeTitle?.value, dietaryPreferences)
+                val result = getLocalRecipe(image, input.value, recipeTitle?.value, _dietaryPreferences.value)
                 if (result.isSuccess) {
                     state.value = MainViewState.Success(result.getOrThrow())
                 } else {
@@ -91,7 +63,7 @@ class MainViewModel : ViewModel() {
             }
             ModelType.CLOUD -> {
                 // Use real Gemini service in online mode
-                val result = getGeminiRecipe(image, input.value, recipeTitle?.value, dietaryPreferences)
+                val result = getGeminiRecipe(image, input.value, recipeTitle?.value, _dietaryPreferences.value)
                 if (result.isSuccess) {
                     state.value = MainViewState.Success(result.getOrThrow())
                 } else {
@@ -115,53 +87,52 @@ class MainViewModel : ViewModel() {
     }
 
     fun setVegetarian(value: Boolean) {
-        _vegetarian.value = value
+        // Update preference in repository
         preferencesRepository.saveBoolean(PreferenceKeys.VEGETARIAN, value)
+        // Update DietaryPreferences state
+        _dietaryPreferences.value = _dietaryPreferences.value.copy(vegetarian = value)
     }
 
     fun setLactoseFree(value: Boolean) {
-        _lactoseFree.value = value
+        // Update preference in repository
         preferencesRepository.saveBoolean(PreferenceKeys.LACTOSE_FREE, value)
+        // Update DietaryPreferences state
+        _dietaryPreferences.value = _dietaryPreferences.value.copy(lactoseFree = value)
     }
 
     fun setVegan(value: Boolean) {
-        _vegan.value = value
+        // Update preference in repository
         preferencesRepository.saveBoolean(PreferenceKeys.VEGAN, value)
+        // Update DietaryPreferences state
+        _dietaryPreferences.value = _dietaryPreferences.value.copy(vegan = value)
     }
 
     fun setGlutenFree(value: Boolean) {
-        _glutenFree.value = value
+        // Update preference in repository
         preferencesRepository.saveBoolean(PreferenceKeys.GLUTEN_FREE, value)
+        // Update DietaryPreferences state
+        _dietaryPreferences.value = _dietaryPreferences.value.copy(glutenFree = value)
     }
 
     fun setNoSeafood(value: Boolean) {
-        _noSeafood.value = value
+        // Update preference in repository
         preferencesRepository.saveBoolean(PreferenceKeys.NO_SEAFOOD, value)
+        // Update DietaryPreferences state
+        _dietaryPreferences.value = _dietaryPreferences.value.copy(noSeafood = value)
     }
 
     fun setNoPeanuts(value: Boolean) {
-        _noPeanuts.value = value
+        // Update preference in repository
         preferencesRepository.saveBoolean(PreferenceKeys.NO_PEANUTS, value)
+        // Update DietaryPreferences state
+        _dietaryPreferences.value = _dietaryPreferences.value.copy(noPeanuts = value)
     }
 
     fun setNoPork(value: Boolean) {
-        _noPork.value = value
+        // Update preference in repository
         preferencesRepository.saveBoolean(PreferenceKeys.NO_PORK, value)
-    }
-
-    /**
-     * Creates a DietaryPreferences object from the current preference values.
-     */
-    private fun createDietaryPreferences(): DietaryPreferences {
-        return DietaryPreferences(
-            vegetarian = _vegetarian.value,
-            lactoseFree = _lactoseFree.value,
-            vegan = _vegan.value,
-            glutenFree = _glutenFree.value,
-            noSeafood = _noSeafood.value,
-            noPeanuts = _noPeanuts.value,
-            noPork = _noPork.value
-        )
+        // Update DietaryPreferences state
+        _dietaryPreferences.value = _dietaryPreferences.value.copy(noPork = value)
     }
 
     sealed interface MainViewState {

@@ -23,13 +23,7 @@ fun SettingsScreen(
     viewModel: MainViewModel,
     modifier: Modifier = Modifier
 ) {
-    val vegetarian by viewModel.vegetarian.collectAsState()
-    val lactoseFree by viewModel.lactoseFree.collectAsState()
-    val vegan by viewModel.vegan.collectAsState()
-    val glutenFree by viewModel.glutenFree.collectAsState()
-    val noSeafood by viewModel.noSeafood.collectAsState()
-    val noPeanuts by viewModel.noPeanuts.collectAsState()
-    val noPork by viewModel.noPork.collectAsState()
+    val preferences by viewModel.dietaryPreferences.collectAsState()
 
     Card(
         modifier = modifier
@@ -50,43 +44,43 @@ fun SettingsScreen(
 
             DietaryPreferenceItem(
                 text = "Vegetarian",
-                checked = vegetarian,
+                checked = preferences.vegetarian,
                 onCheckedChange = { viewModel.setVegetarian(it) }
             )
 
             DietaryPreferenceItem(
                 text = "Lactose Free",
-                checked = lactoseFree,
+                checked = preferences.lactoseFree,
                 onCheckedChange = { viewModel.setLactoseFree(it) }
             )
 
             DietaryPreferenceItem(
                 text = "Vegan",
-                checked = vegan,
+                checked = preferences.vegan,
                 onCheckedChange = { viewModel.setVegan(it) }
             )
 
             DietaryPreferenceItem(
                 text = "Gluten Free",
-                checked = glutenFree,
+                checked = preferences.glutenFree,
                 onCheckedChange = { viewModel.setGlutenFree(it) }
             )
 
             DietaryPreferenceItem(
                 text = "No Seafood",
-                checked = noSeafood,
+                checked = preferences.noSeafood,
                 onCheckedChange = { viewModel.setNoSeafood(it) }
             )
 
             DietaryPreferenceItem(
                 text = "No Peanuts",
-                checked = noPeanuts,
+                checked = preferences.noPeanuts,
                 onCheckedChange = { viewModel.setNoPeanuts(it) }
             )
 
             DietaryPreferenceItem(
                 text = "No Pork",
-                checked = noPork,
+                checked = preferences.noPork,
                 onCheckedChange = { viewModel.setNoPork(it) }
             )
         }
