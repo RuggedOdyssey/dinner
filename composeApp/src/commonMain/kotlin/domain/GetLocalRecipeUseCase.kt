@@ -42,32 +42,40 @@ class GetLocalRecipeUseCase(private val llmFactory: LLMFactory) : RecipeUseCase 
     /**
      * Parses the LLM output text into a structured Recipe object.
      * Also adds the input ingredients as part of the recipe ingredients.
+     * Removes markdown formatting (bold and italic) from the text.
      */
     private fun parseRecipeText(response: String, recipeTitle: String?, ingredients: List<String>): Recipe {
+        // Remove markdown bold and italic formatting
+        val cleanedResponse = response
+            .replace(Regex("\\*\\*(.*?)\\*\\*"), "$1") // Remove bold (**text**)
+            .replace(Regex("\\*(.*?)\\*"), "$1")       // Remove italic (*text*)
+
         // Parse the LLM output into our data structure
-        val lines = response.split("\n")
-        val title = recipeTitle?.takeIf { it.isNotBlank() } ?: lines.firstOrNull() ?: "Recipe"
+        val lines = cleanedResponse.split("\n")
 
+        // Extract title (use provided title or first line)
+        val title = recipeTitle?.takeIf { it.isNotBlank() } 
+            ?: lines.firstOrNull()?.trim() 
+            ?: "Recipe"
+
+        // Extract ingredients section using regex
         val ingredientsList = mutableListOf<Ingredient>()
-        val steps = mutableListOf<String>()
+        val ingredientSectionRegex = Regex("(?i)ingredients?:?\\s*\\n(.*?)(?=\\n\\s*(?:instructions?|directions?|steps?):?|$)", RegexOption.DOT_MATCHES_ALL)
+        val ingredientMatch = ingredientSectionRegex.find(cleanedResponse)
 
-        var inIngredients = false
-        var inSteps = false
+        ingredientMatch?.groups?.get(1)?.value?.split("\n")?.forEach { line ->
+            val trimmedLine = line.trim()
+            if (trimmedLine.isNotBlank()) {
+                // Extract quantity and name using regex
+                val ingredientRegex = Regex("^([\\d/.,\\s]+\\s*(?:g|kg|ml|l|cup|cups|tbsp|tsp|tablespoon|teaspoon|pinch|to taste|handful|piece|pieces)?)\\s*(.+)$")
+                val match = ingredientRegex.find(trimmedLine)
 
-        lines.forEach { line ->
-            when {
-                line.contains("Ingredients", ignoreCase = true) && !inIngredients && !inSteps -> {
-                    inIngredients = true
-                }
-                line.contains("Instructions", ignoreCase = true) || 
-                    line.contains("Directions", ignoreCase = true) || 
-                    line.contains("Steps", ignoreCase = true) -> {
-                    inIngredients = false
-                    inSteps = true
-                }
-                inIngredients && line.isNotBlank() && !line.contains("Ingredients", ignoreCase = true) -> {
-                    val trimmedLine = line.trim()
-                    // Try to split the ingredient line into quantity and name
+                if (match != null) {
+                    val quantity = match.groups[1]?.value?.trim() ?: ""
+                    val name = match.groups[2]?.value?.trim() ?: trimmedLine
+                    ingredientsList.add(Ingredient(name = name, quantity = quantity))
+                } else {
+                    // If regex doesn't match, fall back to simple space splitting
                     val parts = trimmedLine.split(" ", limit = 2)
                     if (parts.size > 1) {
                         ingredientsList.add(Ingredient(name = parts[1], quantity = parts[0]))
@@ -75,12 +83,20 @@ class GetLocalRecipeUseCase(private val llmFactory: LLMFactory) : RecipeUseCase 
                         ingredientsList.add(Ingredient(name = trimmedLine, quantity = ""))
                     }
                 }
-                inSteps && line.isNotBlank() && 
-                    !line.contains("Instructions", ignoreCase = true) && 
-                    !line.contains("Directions", ignoreCase = true) && 
-                    !line.contains("Steps", ignoreCase = true) -> {
-                    steps.add(line.trim())
-                }
+            }
+        }
+
+        // Extract steps section using regex
+        val steps = mutableListOf<String>()
+        val stepsSectionRegex = Regex("(?i)(?:instructions?|directions?|steps?):?\\s*\\n(.*?)$", RegexOption.DOT_MATCHES_ALL)
+        val stepsMatch = stepsSectionRegex.find(cleanedResponse)
+
+        stepsMatch?.groups?.get(1)?.value?.split("\n")?.forEach { line ->
+            val trimmedLine = line.trim()
+            if (trimmedLine.isNotBlank()) {
+                // Remove step numbers if present
+                val cleanedStep = trimmedLine.replace(Regex("^\\d+\\.?\\s*"), "")
+                steps.add(cleanedStep)
             }
         }
 

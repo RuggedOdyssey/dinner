@@ -37,6 +37,17 @@ To access the Gemini API, you need to set up a token:
 3. Run the script `./token` - it will use gcloud to print the token, copy it into local properties, and rebuild the `BuildKonfig` file
 4. Build and run the app
 
+### On device model Setup
+The model that is used on the device local feature uses Gemma 3 1B. You need to get the model and then put it in the `/data/local/tmp` folder.
+1. [Download](https://huggingface.co/litert-community/Gemma3-1B-IT/resolve/main/gemma3-1b-it-int4.task) the Gemma 3 1B model
+2. Push the model to the device with
+
+   a. `adb shell mkdir -p /data/local/tmp`
+
+   b. `adb push <local_folder> /data/local/tmp/gemma3-1b-it-int4.task`
+
+Find more information and examples in the [documentation](https://ai.google.dev/edge/mediapipe/solutions/genai/llm_inference/android)
+
 ## Contribution Guidelines
 
 When contributing to this project, please follow these guidelines:
