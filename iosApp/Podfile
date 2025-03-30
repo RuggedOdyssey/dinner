@@ -1,9 +1,0 @@
-platform :ios, '14.0'
-
-target 'iosApp' do
-  use_frameworks!
-  
-  # Pods for iosApp
-  pod 'MediaPipeTasksGenAI', '~> 0.10.0'
-  pod 'MediaPipeTasksGenAIC', '~> 0.10.0'
-end

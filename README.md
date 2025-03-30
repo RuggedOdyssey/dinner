@@ -9,32 +9,26 @@ This is the companion app for the talk titled "OK Gemini, what's for dinner?" an
 ### Key Features
 - Photo-to-recipe conversion using Gemini LLM
 - Grocery list generation based on image analysis
-- Cross-platform support for Android and iOS
+- Android application
 
 ### Technology Stack
-- **Kotlin Multiplatform**: For shared code across platforms
+- **Kotlin Multiplatform**: For code organization
 - **Compose Multiplatform**: For UI components
 - **Google Gemini API**: For multimodal LLM capabilities
-- **SwiftUI**: For iOS-specific UI components
 
 ## Project Structure
 
-The project follows the standard Kotlin Multiplatform structure:
+The project follows a Kotlin Multiplatform structure:
 
-- `/composeApp`: Contains code shared across platforms
-  - `commonMain`: Common code for all targets
-  - Platform-specific folders for platform-specific implementations
-
-- `/iosApp`: iOS application entry point and SwiftUI code
-
-> ℹ️ **Note**: The iOS app needs some attention as it doesn't run at the moment.
+- `/composeApp`: Contains the application code
+  - `commonMain`: Common code
+  - `androidMain`: Android-specific implementations
 
 ## Development Setup
 
 ### Prerequisites
 1. Android Studio or IntelliJ IDEA with Kotlin Multiplatform support
-2. Xcode (for iOS development)
-3. Google Cloud CLI (for API token generation)
+2. Google Cloud CLI (for API token generation)
 
 ### API Token Setup
 To access the Gemini API, you need to set up a token:
