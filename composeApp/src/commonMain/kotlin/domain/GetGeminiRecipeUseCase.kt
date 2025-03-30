@@ -1,7 +1,6 @@
 package domain
 
 import data.VertexService
-import data.dto.Output
 import data.dto.Recipe
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
@@ -15,7 +14,7 @@ class GetGeminiRecipeUseCase(private val service: VertexService = VertexService(
         availableProducts: String, 
         recipeTitle: String?,
         dietaryPreferences: DietaryPreferences
-    ): Result<Output> {
+    ): Result<Recipe> {
         // Use the online service
         val encodedBitmap = Base64.encode(photo)
         val prompt = RecipePrompt.makePrompt(availableProducts, recipeTitle, dietaryPreferences)

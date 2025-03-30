@@ -9,13 +9,19 @@ data class GenerationConfig(
     val temperature: Double = 1.0, 
     val topP: Double = 0.95,
     val responseMimeType: String = "application/json",
-    val responseSchema: JsonObject = buildOutputSchema()
+    val responseSchema: JsonObject = buildRecipeSchema()
 )
 
-private fun buildOutputSchema(): JsonObject = buildJsonObject {
+private fun buildRecipeSchema(): JsonObject = buildJsonObject {
     put("type", "object")
     putJsonObject("properties") {
-        putJsonObject("groceries") {
+        putJsonObject("title") {
+            put("type", "string")
+        }
+        putJsonObject("description") {
+            put("type", "string")
+        }
+        putJsonObject("ingredients") {
             put("type", "array")
             putJsonObject("items") {
                 put("type", "object")
@@ -33,50 +39,17 @@ private fun buildOutputSchema(): JsonObject = buildJsonObject {
                 }
             }
         }
-        putJsonObject("recipe") {
-            put("type", "object")
-            putJsonObject("properties") {
-                putJsonObject("title") {
-                    put("type", "string")
-                }
-                putJsonObject("description") {
-                    put("type", "string")
-                }
-                putJsonObject("ingredients") {
-                    put("type", "array")
-                    putJsonObject("items") {
-                        put("type", "object")
-                        putJsonObject("properties") {
-                            putJsonObject("name") {
-                                put("type", "string")
-                            }
-                            putJsonObject("quantity") {
-                                put("type", "string")
-                            }
-                        }
-                        putJsonArray("required") {
-                            add(JsonPrimitive("name"))
-                            add(JsonPrimitive("quantity"))
-                        }
-                    }
-                }
-                putJsonObject("steps") {
-                    put("type", "array")
-                    putJsonObject("items") {
-                        put("type", "string")
-                    }
-                }
-            }
-            putJsonArray("required") {
-                add(JsonPrimitive("title"))
-                add(JsonPrimitive("description"))
-                add(JsonPrimitive("ingredients"))
-                add(JsonPrimitive("steps"))
+        putJsonObject("steps") {
+            put("type", "array")
+            putJsonObject("items") {
+                put("type", "string")
             }
         }
     }
     putJsonArray("required") {
-        add(JsonPrimitive("groceries"))
-        add(JsonPrimitive("recipe"))
+        add(JsonPrimitive("title"))
+        add(JsonPrimitive("description"))
+        add(JsonPrimitive("ingredients"))
+        add(JsonPrimitive("steps"))
     }
 }

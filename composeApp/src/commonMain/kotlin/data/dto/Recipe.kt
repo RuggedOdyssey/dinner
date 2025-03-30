@@ -3,12 +3,6 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 
 @Serializable
-data class Output(
-    val groceries: List<Ingredient> = emptyList(),
-    val recipe: Recipe = Recipe()
-)
-
-@Serializable
 data class Ingredient(
     val name: String = "",
     val quantity: String = ""
@@ -22,4 +16,4 @@ data class Recipe(
     val title: String = ""
 )
 
-fun String.toOutput() = Json { ignoreUnknownKeys = true }.decodeFromString<Output>(this)
+fun String.toRecipe() = Json { ignoreUnknownKeys = true }.decodeFromString<Recipe>(this)

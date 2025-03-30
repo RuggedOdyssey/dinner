@@ -32,7 +32,7 @@ class VertexService {
         ignoreUnknownKeys = true
     }
 
-    suspend fun getGeminiResponse(encodedImage: String, prompt: String): Result<Output> {
+    suspend fun getGeminiResponse(encodedImage: String, prompt: String): Result<Recipe> {
         val builder = HttpRequestBuilder()
 
         builder.url("https://${API_ENDPOINT}/v1/projects/${PROJECT_ID}/locations/${LOCATION_ID}/publishers/google/models/${MODEL_ID}:streamGenerateContent")
@@ -73,13 +73,28 @@ class VertexService {
         )
     }
 
-    private fun formatResponse(result: List<CandidatesResponse>) = result.joinToString("\n") { response ->
-        response.candidates.joinToString("\n") { candidate ->
-            candidate.content.parts.joinToString("\n") { part ->
-                part.text ?: ""
+    private fun formatResponse(result: List<CandidatesResponse>): Recipe {
+        val responseText = result.joinToString("\n") { response ->
+            response.candidates.joinToString("\n") { candidate ->
+                candidate.content.parts.joinToString("\n") { part ->
+                    part.text ?: ""
+                }
             }
         }
-    }.toOutput()
+
+        // Try to parse as Recipe using the extension function
+        return try {
+            responseText.toRecipe()
+        } catch (e: Exception) {
+            // If JSON parsing fails, return a basic Recipe with the response text as description
+            Recipe(
+                title = "Generated Recipe",
+                description = responseText,
+                ingredients = emptyList(),
+                steps = emptyList()
+            )
+        }
+    }
 
     private companion object {
         const val API_ENDPOINT = "us-central1-aiplatform.googleapis.com"

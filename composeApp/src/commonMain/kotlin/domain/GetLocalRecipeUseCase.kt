@@ -1,6 +1,5 @@
 package domain
 
-import data.dto.Output
 import data.dto.Recipe
 import data.dto.Ingredient
 import data.llminference.LLMFactory
@@ -22,7 +21,7 @@ class GetLocalRecipeUseCase(private val llmFactory: LLMFactory) : RecipeUseCase 
         availableProducts: String, 
         recipeTitle: String?,
         dietaryPreferences: DietaryPreferences
-    ): Result<Output> {
+    ): Result<Recipe> {
         return try {
             // Parse ingredients from availableProducts
             val ingredients = availableProducts.split(",").map { it.trim() }.filter { it.isNotEmpty() }
@@ -32,18 +31,19 @@ class GetLocalRecipeUseCase(private val llmFactory: LLMFactory) : RecipeUseCase 
                 it != "Loading..." && !it.contains("Model not available") 
             }
 
-            // Parse the recipe text into an Output object
-            val output = parseRecipeText(recipeText, recipeTitle, ingredients)
-            Result.success(output)
+            // Parse the recipe text into a Recipe object
+            val recipe = parseRecipeText(recipeText, recipeTitle, ingredients)
+            Result.success(recipe)
         } catch (e: Exception) {
             Result.failure(e)
         }
     }
 
     /**
-     * Parses the LLM output text into a structured Output object.
+     * Parses the LLM output text into a structured Recipe object.
+     * Also adds the input ingredients as part of the recipe ingredients.
      */
-    private fun parseRecipeText(response: String, recipeTitle: String?, ingredients: List<String>): Output {
+    private fun parseRecipeText(response: String, recipeTitle: String?, ingredients: List<String>): Recipe {
         // Parse the LLM output into our data structure
         val lines = response.split("\n")
         val title = recipeTitle?.takeIf { it.isNotBlank() } ?: lines.firstOrNull() ?: "Recipe"
@@ -84,16 +84,29 @@ class GetLocalRecipeUseCase(private val llmFactory: LLMFactory) : RecipeUseCase 
             }
         }
 
-        val recipe = Recipe(
+        // Add the input ingredients to the recipe ingredients if they're not already included
+        val inputIngredients = ingredients.map { inputIngredient ->
+            // Check if this input ingredient is already in the parsed ingredients list
+            val existingIngredient = ingredientsList.find { 
+                it.name.contains(inputIngredient, ignoreCase = true) 
+            }
+
+            if (existingIngredient != null) {
+                existingIngredient
+            } else {
+                // Add as a new ingredient with empty quantity
+                Ingredient(name = inputIngredient, quantity = "")
+            }
+        }
+
+        // Combine parsed ingredients with input ingredients, removing duplicates
+        val allIngredients = (ingredientsList + inputIngredients).distinctBy { it.name.lowercase() }
+
+        return Recipe(
             title = title,
             description = "Generated with on-device LLM",
-            ingredients = ingredientsList,
+            ingredients = allIngredients,
             steps = steps
-        )
-
-        return Output(
-            groceries = ingredients.map { Ingredient(name = it, quantity = "") },
-            recipe = recipe
         )
     }
 
