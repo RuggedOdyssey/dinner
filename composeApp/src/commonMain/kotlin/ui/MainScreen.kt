@@ -108,13 +108,16 @@ fun MainScreen() {
             } else {
                 when (viewState) {
                     is MainViewModel.MainViewState.Input -> {
+                        val pantryIngredient by viewModel.pantryIngredient.collectAsState()
                         InputScreen(
                             modifier = Modifier.padding(innerPadding),
-                            getRecipe = { image, input, recipeTitle -> 
-                                viewModel.getRecipe(image, input, recipeTitle)
+                            getRecipe = { image, pantryIngredient, recipeTitle -> 
+                                viewModel.getRecipe(image, pantryIngredient, recipeTitle)
                             },
                             modelType = modelType,
-                            setModelType = viewModel::setModelType
+                            setModelType = viewModel::setModelType,
+                            pantryIngredient = pantryIngredient,
+                            updatePantryIngredient = viewModel::updatePantryIngredient
                         )
                     }
 
@@ -148,13 +151,15 @@ private fun InputScreen(
     modifier: Modifier = Modifier,
     getRecipe: (ByteArray, MutableState<String>, MutableState<String>?) -> Unit,
     modelType: ModelType,
-    setModelType: (ModelType) -> Unit
+    setModelType: (ModelType) -> Unit,
+    pantryIngredient: String,
+    updatePantryIngredient: (String) -> Unit
 ) {
-    val input = remember { mutableStateOf("") }
+    val pantryIngredientState = remember { mutableStateOf(pantryIngredient) }
     val recipeTitle = remember { mutableStateOf("") }
     val state = rememberPeekabooCameraState(onCapture = {
         it?.let { image ->
-            getRecipe(image, input, if (modelType == ModelType.ON_DEVICE) recipeTitle else null)
+            getRecipe(image, pantryIngredientState, if (modelType == ModelType.ON_DEVICE) recipeTitle else null)
         }
     })
 
@@ -179,8 +184,11 @@ private fun InputScreen(
             }
 
             TextField(
-                value = input.value,
-                onValueChange = { input.value = it },
+                value = pantryIngredientState.value,
+                onValueChange = { 
+                    pantryIngredientState.value = it
+                    updatePantryIngredient(it)
+                },
                 label = { Text("Enter available products") },
                 modifier = Modifier.padding(top = 16.dp)
             )
@@ -211,7 +219,7 @@ private fun InputScreen(
                 Button(
                     onClick = { 
                         // Call getRecipe with empty photo data
-                        getRecipe(ByteArray(0), input, if (modelType == ModelType.ON_DEVICE) recipeTitle else null)
+                        getRecipe(ByteArray(0), pantryIngredientState, if (modelType == ModelType.ON_DEVICE) recipeTitle else null)
                     },
                     modifier = Modifier.padding(top = 16.dp)
                 ) {

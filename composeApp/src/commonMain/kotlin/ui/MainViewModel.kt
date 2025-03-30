@@ -29,6 +29,10 @@ class MainViewModel : ViewModel() {
     private val _modelType = MutableStateFlow(ModelType.ON_DEVICE) // Default to on-device mode
     val modelType: StateFlow<ModelType> = _modelType
 
+    // Pantry ingredient state
+    private val _pantryIngredient = MutableStateFlow("")
+    val pantryIngredient: StateFlow<String> = _pantryIngredient
+
     // Preferences repository for storing dietary preferences
     private val preferencesRepository = PreferencesRepository()
 
@@ -144,6 +148,10 @@ class MainViewModel : ViewModel() {
         preferencesRepository.saveBoolean(PreferenceKeys.NO_PORK, value)
         // Update DietaryPreferences state
         _dietaryPreferences.value = _dietaryPreferences.value.copy(noPork = value)
+    }
+
+    fun updatePantryIngredient(value: String) {
+        _pantryIngredient.value = value
     }
 
     sealed interface MainViewState {
