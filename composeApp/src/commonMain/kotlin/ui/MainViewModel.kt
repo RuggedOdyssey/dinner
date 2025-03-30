@@ -10,6 +10,7 @@ import data.preferences.PreferencesRepository
 import domain.DietaryPreferences
 import domain.GetGeminiRecipeUseCase
 import domain.GetLocalRecipeUseCase
+import domain.RecipeUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -50,27 +51,19 @@ class MainViewModel : ViewModel() {
     fun getRecipe(image: ByteArray, input: MutableState<String>, recipeTitle: MutableState<String>? = null) = viewModelScope.launch(Dispatchers.IO) {
         state.value = MainViewState.Loading
 
-        when (_modelType.value) {
-            ModelType.ON_DEVICE -> {
-                // Use on-device LLM model
-                val result = getLocalRecipe(image, input.value, recipeTitle?.value, _dietaryPreferences.value)
-                if (result.isSuccess) {
-                    state.value = MainViewState.Success(result.getOrThrow())
-                } else {
-                    result.exceptionOrNull()?.printStackTrace()
-                    state.value = MainViewState.Error(result.exceptionOrNull()?.message ?: "An error occurred")
-                }
-            }
-            ModelType.CLOUD -> {
-                // Use real Gemini service in online mode
-                val result = getGeminiRecipe(image, input.value, recipeTitle?.value, _dietaryPreferences.value)
-                if (result.isSuccess) {
-                    state.value = MainViewState.Success(result.getOrThrow())
-                } else {
-                    result.exceptionOrNull()?.printStackTrace()
-                    state.value = MainViewState.Error(result.exceptionOrNull()?.message ?: "An error occurred")
-                }
-            }
+        // Select the appropriate use case based on model type
+        val useCase: RecipeUseCase = when (_modelType.value) {
+            ModelType.ON_DEVICE -> getLocalRecipe
+            ModelType.CLOUD -> getGeminiRecipe
+        }
+
+        // Invoke the selected use case and handle the result
+        val result = useCase(image, input.value, recipeTitle?.value, _dietaryPreferences.value)
+        if (result.isSuccess) {
+            state.value = MainViewState.Success(result.getOrThrow())
+        } else {
+            result.exceptionOrNull()?.printStackTrace()
+            state.value = MainViewState.Error(result.exceptionOrNull()?.message ?: "An error occurred")
         }
     }
 
@@ -103,8 +96,26 @@ class MainViewModel : ViewModel() {
     fun setVegan(value: Boolean) {
         // Update preference in repository
         preferencesRepository.saveBoolean(PreferenceKeys.VEGAN, value)
-        // Update DietaryPreferences state
-        _dietaryPreferences.value = _dietaryPreferences.value.copy(vegan = value)
+
+        // If vegan is set to true, also set vegetarian, lactose free, no pork, and no seafood to true
+        if (value) {
+            preferencesRepository.saveBoolean(PreferenceKeys.VEGETARIAN, true)
+            preferencesRepository.saveBoolean(PreferenceKeys.LACTOSE_FREE, true)
+            preferencesRepository.saveBoolean(PreferenceKeys.NO_PORK, true)
+            preferencesRepository.saveBoolean(PreferenceKeys.NO_SEAFOOD, true)
+
+            // Update DietaryPreferences state with all related preferences
+            _dietaryPreferences.value = _dietaryPreferences.value.copy(
+                vegan = true,
+                vegetarian = true,
+                lactoseFree = true,
+                noPork = true,
+                noSeafood = true
+            )
+        } else {
+            // Just update vegan preference
+            _dietaryPreferences.value = _dietaryPreferences.value.copy(vegan = false)
+        }
     }
 
     fun setGlutenFree(value: Boolean) {
