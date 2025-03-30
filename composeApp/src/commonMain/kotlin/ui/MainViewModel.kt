@@ -22,6 +22,16 @@ enum class ModelType {
     CLOUD // Online mode with cloud model
 }
 
+enum class DietaryPreferenceType(val preferenceKey: String) {
+    VEGETARIAN(PreferenceKeys.VEGETARIAN),
+    LACTOSE_FREE(PreferenceKeys.LACTOSE_FREE),
+    VEGAN(PreferenceKeys.VEGAN),
+    GLUTEN_FREE(PreferenceKeys.GLUTEN_FREE),
+    NO_SEAFOOD(PreferenceKeys.NO_SEAFOOD),
+    NO_PEANUTS(PreferenceKeys.NO_PEANUTS),
+    NO_PORK(PreferenceKeys.NO_PORK);
+}
+
 expect fun createLLMFactory(): LLMFactory
 
 class MainViewModel : ViewModel() {
@@ -97,8 +107,22 @@ class MainViewModel : ViewModel() {
     fun setVegetarian(value: Boolean) {
         // Update preference in repository
         preferencesRepository.saveBoolean(PreferenceKeys.VEGETARIAN, value)
-        // Update DietaryPreferences state
-        _dietaryPreferences.value = _dietaryPreferences.value.copy(vegetarian = value)
+
+        // If vegetarian is set to true, also set no pork and no seafood to true
+        if (value) {
+            preferencesRepository.saveBoolean(PreferenceKeys.NO_PORK, true)
+            preferencesRepository.saveBoolean(PreferenceKeys.NO_SEAFOOD, true)
+
+            // Update DietaryPreferences state with all related preferences
+            _dietaryPreferences.value = _dietaryPreferences.value.copy(
+                vegetarian = true,
+                noPork = true,
+                noSeafood = true
+            )
+        } else {
+            // Just update vegetarian preference
+            _dietaryPreferences.value = _dietaryPreferences.value.copy(vegetarian = false)
+        }
     }
 
     fun setLactoseFree(value: Boolean) {

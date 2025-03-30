@@ -8,8 +8,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Card
+import androidx.compose.material.Checkbox
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.RadioButton
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -99,9 +99,9 @@ private fun DietaryPreferenceItem(
             .padding(vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        RadioButton(
-            selected = checked,
-            onClick = { onCheckedChange(!checked) }
+        Checkbox(
+            checked = checked,
+            onCheckedChange = { onCheckedChange(it) }
         )
         Text(
             text = text,
