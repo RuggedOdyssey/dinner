@@ -11,7 +11,8 @@ data class DietaryPreferences(
     val glutenFree: Boolean = false,
     val noSeafood: Boolean = false,
     val noPeanuts: Boolean = false,
-    val noPork: Boolean = false
+    val noPork: Boolean = false,
+    val other: String = ""
 ) {
     override fun toString(): String {
         val preferences = mutableListOf<String>()
@@ -23,6 +24,7 @@ data class DietaryPreferences(
         if (noSeafood) preferences.add("no seafood")
         if (noPeanuts) preferences.add("no peanuts")
         if (noPork) preferences.add("no pork")
+        if (other.isNotEmpty()) preferences.add(other)
 
         return if (preferences.isEmpty()) {
             "no special dietary preferences"
@@ -40,6 +42,6 @@ fun DietaryPreferences(preferencesRepository: PreferencesRepository): DietaryPre
     glutenFree = preferencesRepository.getBoolean(PreferenceKeys.GLUTEN_FREE, false),
     noSeafood = preferencesRepository.getBoolean(PreferenceKeys.NO_SEAFOOD, false),
     noPeanuts = preferencesRepository.getBoolean(PreferenceKeys.NO_PEANUTS, false),
-    noPork = preferencesRepository.getBoolean(PreferenceKeys.NO_PORK, false)
+    noPork = preferencesRepository.getBoolean(PreferenceKeys.NO_PORK, false),
+    other = preferencesRepository.getString(PreferenceKeys.OTHER, "")
 )
-

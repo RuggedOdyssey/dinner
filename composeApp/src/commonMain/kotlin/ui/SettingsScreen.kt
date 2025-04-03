@@ -10,10 +10,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Card
 import androidx.compose.material.Checkbox
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -82,6 +86,27 @@ fun SettingsScreen(
                 text = "No Pork",
                 checked = preferences.noPork,
                 onCheckedChange = { viewModel.setNoPork(it) }
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Other dietary preferences text field
+            Text(
+                text = "Other",
+                style = MaterialTheme.typography.body1,
+                modifier = Modifier.padding(vertical = 8.dp)
+            )
+
+            var otherText by remember { mutableStateOf(preferences.other) }
+
+            OutlinedTextField(
+                value = otherText,
+                onValueChange = { 
+                    otherText = it
+                    viewModel.setOther(it)
+                },
+                modifier = Modifier.fillMaxWidth(),
+                placeholder = { Text("Enter other dietary preferences") }
             )
         }
     }

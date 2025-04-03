@@ -29,7 +29,8 @@ enum class DietaryPreferenceType(val preferenceKey: String) {
     GLUTEN_FREE(PreferenceKeys.GLUTEN_FREE),
     NO_SEAFOOD(PreferenceKeys.NO_SEAFOOD),
     NO_PEANUTS(PreferenceKeys.NO_PEANUTS),
-    NO_PORK(PreferenceKeys.NO_PORK);
+    NO_PORK(PreferenceKeys.NO_PORK),
+    OTHER(PreferenceKeys.OTHER);
 }
 
 expect fun createLLMFactory(): LLMFactory
@@ -183,6 +184,13 @@ class MainViewModel : ViewModel() {
         preferencesRepository.saveBoolean(PreferenceKeys.NO_PORK, value)
         // Update DietaryPreferences state
         _dietaryPreferences.value = _dietaryPreferences.value.copy(noPork = value)
+    }
+
+    fun setOther(value: String) {
+        // Update preference in repository
+        preferencesRepository.saveString(PreferenceKeys.OTHER, value)
+        // Update DietaryPreferences state
+        _dietaryPreferences.value = _dietaryPreferences.value.copy(other = value)
     }
 
     fun updatePantryIngredient(value: String) {

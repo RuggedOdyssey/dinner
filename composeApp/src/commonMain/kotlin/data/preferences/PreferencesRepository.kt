@@ -13,6 +13,16 @@ expect class PreferencesRepository() {
      * Get a boolean preference, returning defaultValue if not found.
      */
     fun getBoolean(key: String, defaultValue: Boolean = false): Boolean
+
+    /**
+     * Save a string preference.
+     */
+    fun saveString(key: String, value: String)
+
+    /**
+     * Get a string preference, returning defaultValue if not found.
+     */
+    fun getString(key: String, defaultValue: String = ""): String
 }
 
 /**
@@ -26,4 +36,5 @@ object PreferenceKeys {
     const val NO_SEAFOOD = "pref_no_seafood"
     const val NO_PEANUTS = "pref_no_peanuts"
     const val NO_PORK = "pref_no_pork"
+    const val OTHER = "pref_other"
 }

@@ -26,4 +26,18 @@ actual class PreferencesRepository {
     actual fun getBoolean(key: String, defaultValue: Boolean): Boolean {
         return sharedPreferences.getBoolean(key, defaultValue)
     }
+
+    /**
+     * Save a string preference.
+     */
+    actual fun saveString(key: String, value: String) {
+        sharedPreferences.edit().putString(key, value).apply()
+    }
+
+    /**
+     * Get a string preference, returning defaultValue if not found.
+     */
+    actual fun getString(key: String, defaultValue: String): String {
+        return sharedPreferences.getString(key, defaultValue) ?: defaultValue
+    }
 }
