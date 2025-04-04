@@ -40,6 +40,31 @@ class GetLocalRecipeUseCase(private val llmFactory: LLMFactory) : RecipeUseCase 
     }
 
     /**
+     * Original method for getting a recipe based on ingredients.
+     * Returns a flow of strings representing the recipe generation progress and result.
+     */
+    private fun getRecipe(
+        photo: ByteArray,
+        ingredients: List<String>,
+        recipeTitle: String? = null,
+        dietaryPreferences: DietaryPreferences = DietaryPreferences()
+    ): Flow<String> = flow {
+        emit("Loading...")
+
+        // Check if model is available
+        if (!llmProcessor.isModelAvailable()) {
+            emit("Model not available. Please ensure the model is installed.")
+            return@flow
+        }
+
+        val ingredientsText = ingredients.joinToString(", ")
+        val prompt = RecipePrompt.makePrompt(ingredientsText, recipeTitle, dietaryPreferences)
+
+        val response = llmProcessor.generateText(photo, prompt)
+        emit(response)
+    }
+
+    /**
      * Parses the LLM output text into a structured Recipe object.
      * Also adds the input ingredients as part of the recipe ingredients.
      * Removes markdown formatting (bold and italic) from the text.
@@ -54,8 +79,8 @@ class GetLocalRecipeUseCase(private val llmFactory: LLMFactory) : RecipeUseCase 
         val lines = cleanedResponse.split("\n")
 
         // Extract title (use provided title or first line)
-        val title = recipeTitle?.takeIf { it.isNotBlank() } 
-            ?: lines.firstOrNull()?.trim() 
+        val title = recipeTitle?.takeIf { it.isNotBlank() }
+            ?: lines.firstOrNull()?.trim()
             ?: "Recipe"
 
         // Extract ingredients section using regex
@@ -103,8 +128,8 @@ class GetLocalRecipeUseCase(private val llmFactory: LLMFactory) : RecipeUseCase 
         // Add the input ingredients to the recipe ingredients if they're not already included
         val inputIngredients = ingredients.map { inputIngredient ->
             // Check if this input ingredient is already in the parsed ingredients list
-            val existingIngredient = ingredientsList.find { 
-                it.name.contains(inputIngredient, ignoreCase = true) 
+            val existingIngredient = ingredientsList.find {
+                it.name.contains(inputIngredient, ignoreCase = true)
             }
 
             if (existingIngredient != null) {
@@ -124,30 +149,5 @@ class GetLocalRecipeUseCase(private val llmFactory: LLMFactory) : RecipeUseCase 
             ingredients = allIngredients,
             steps = steps
         )
-    }
-
-    /**
-     * Original method for getting a recipe based on ingredients.
-     * Returns a flow of strings representing the recipe generation progress and result.
-     */
-    private fun getRecipe(
-        photo: ByteArray, 
-        ingredients: List<String>, 
-        recipeTitle: String? = null,
-        dietaryPreferences: DietaryPreferences = DietaryPreferences()
-    ): Flow<String> = flow {
-        emit("Loading...")
-
-        // Check if model is available
-        if (!llmProcessor.isModelAvailable()) {
-            emit("Model not available. Please ensure the model is installed.")
-            return@flow
-        }
-
-        val ingredientsText = ingredients.joinToString(", ")
-        val prompt = RecipePrompt.makePrompt(ingredientsText, recipeTitle, dietaryPreferences)
-
-        val response = llmProcessor.generateText(photo, prompt)
-        emit(response)
     }
 }
