@@ -63,3 +63,6 @@ When contributing to this project, please follow these guidelines:
 - [Kotlin Multiplatform Documentation](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html)
 - [Compose Multiplatform Documentation](https://www.jetbrains.com/lp/compose-multiplatform/)
 - [Google Gemini API Documentation](https://ai.google.dev/docs)
+- [Media pipe llm inference on Android](https://ai.google.dev/edge/mediapipe/solutions/genai/llm_inference/android)
+- [Gemma 3 on mobile](https://developers.googleblog.com/en/gemma-3-on-mobile-and-web-with-google-ai-edge/)
+- [Media pipe samples on github](https://github.com/google-ai-edge/mediapipe-samples/blob/main/examples/llm_inference/android/README.md)
