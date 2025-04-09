@@ -66,3 +66,7 @@ When contributing to this project, please follow these guidelines:
 - [Media pipe llm inference on Android](https://ai.google.dev/edge/mediapipe/solutions/genai/llm_inference/android)
 - [Gemma 3 on mobile](https://developers.googleblog.com/en/gemma-3-on-mobile-and-web-with-google-ai-edge/)
 - [Media pipe samples on github](https://github.com/google-ai-edge/mediapipe-samples/blob/main/examples/llm_inference/android/README.md)
+- [Vertex AI in Firebase](https://firebase.google.com/docs/vertex-ai)
+- [Structured output](https://www.boundaryml.com/blog/structured-output-from-llms)
+- [Structured output course](https://www.deeplearning.ai/short-courses/getting-structured-llm-output/)
+- [Structured generated output](https://medium.com/@denis-learns-tech/the-proper-way-to-generate-structured-data-with-llms-b01f4724c066)
